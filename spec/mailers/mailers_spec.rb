@@ -80,13 +80,15 @@ RSpec.describe "Mailers" do
   describe Users::DeviseMailer do
     let(:user) { create(:user) }
 
-    describe "confirmation_instructions" do
-      let(:mail) { described_class.confirmation_instructions(user, "abc123") }
+    describe "email_changed" do
+      let(:mail) { described_class.email_changed(user) }
 
       it_behaves_like "an email with both formats"
 
-      it "includes the confirmation token" do
-        expect(mail.body.encoded).to include("abc123")
+      it "warns the address that the account's email was changed" do
+        # Addresses are not verified, so this notice is the only signal a
+        # hijacked account gives its real owner.
+        expect(mail.body.encoded).to include(user.email)
       end
     end
 
@@ -103,9 +105,9 @@ RSpec.describe "Mailers" do
 
   describe "delivery" do
     it "always goes through Active Job, never inline" do
-      user = create(:user, :unconfirmed)
+      user = create(:user)
 
-      expect { user.send_confirmation_instructions }
+      expect { user.send_reset_password_instructions }
         .to have_enqueued_job(ActionMailer::MailDeliveryJob)
 
       expect(ActionMailer::Base.deliveries).to be_empty

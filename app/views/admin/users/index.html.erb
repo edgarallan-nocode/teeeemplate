@@ -28,9 +28,6 @@
           <td class="numeric"><%= user.memberships.size %></td>
           <td>
             <% if user.admin? %><span class="badge badge--accent">Admin</span><% end %>
-            <% if user.confirmed_at.nil? %>
-              <span class="badge badge--caution">Unconfirmed</span>
-            <% end %>
           </td>
           <td class="is-numeric quiet"><%= short_date(user.created_at) %></td>
         </tr>

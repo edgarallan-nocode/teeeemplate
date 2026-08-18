@@ -6,9 +6,6 @@
 #
 #  id                     :bigint           not null, primary key
 #  admin                  :boolean          default(FALSE), not null
-#  confirmation_sent_at   :datetime
-#  confirmation_token     :string
-#  confirmed_at           :datetime
 #  current_sign_in_at     :datetime
 #  current_sign_in_ip     :string
 #  email                  :string           default(""), not null
@@ -21,7 +18,6 @@
 #  reset_password_sent_at :datetime
 #  reset_password_token   :string
 #  sign_in_count          :integer          default(0), not null
-#  unconfirmed_email      :string
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #  last_team_id           :bigint
@@ -29,7 +25,6 @@
 # Indexes
 #
 #  index_users_on_admin                 (admin) WHERE admin
-#  index_users_on_confirmation_token    (confirmation_token) UNIQUE
 #  index_users_on_email                 (email) UNIQUE
 #  index_users_on_last_team_id          (last_team_id)
 #  index_users_on_reset_password_token  (reset_password_token) UNIQUE
@@ -44,11 +39,6 @@ FactoryBot.define do
     password { "password1234" }
     first_name { Faker::Name.first_name }
     last_name { Faker::Name.last_name }
-    confirmed_at { Time.current }
-
-    trait :unconfirmed do
-      confirmed_at { nil }
-    end
 
     trait :admin do
       admin { true }

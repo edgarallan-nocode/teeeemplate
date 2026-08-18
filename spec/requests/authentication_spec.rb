@@ -4,7 +4,7 @@ require "rails_helper"
 
 RSpec.describe "Authentication" do
   describe "signing up" do
-    it "creates an unconfirmed user and sends a confirmation email" do
+    it "creates an account that works immediately" do
       expect {
         post user_registration_path, params: {
           user: {
@@ -15,23 +15,32 @@ RSpec.describe "Authentication" do
         }
       }.to change(User, :count).by(1)
 
-      user = User.find_by(email: "new@example.com")
-      expect(user.confirmed_at).to be_nil
-      expect(enqueued_jobs.map { _1[:args].first }).to include("Users::DeviseMailer")
+      # No confirmation step: the new user is signed in straight away and is
+      # sent on to create a team.
+      expect(response).to redirect_to(dashboard_path)
+
+      follow_redirect!
+      expect(response).to redirect_to(new_team_path)
     end
 
-    it "sends confirmation mail through Active Job, never inline" do
+    it "sends no confirmation email" do
       expect {
         post user_registration_path, params: {
-          user: { email: "async@example.com", password: "password1234",
+          user: { email: "quiet@example.com", password: "password1234",
                   password_confirmation: "password1234" }
         }
-      }.to have_enqueued_job(ActionMailer::MailDeliveryJob)
+      }.not_to have_enqueued_job(ActionMailer::MailDeliveryJob)
     end
 
-    it "rejects a password below the minimum length" do
+    it "rejects a password below the configured minimum length" do
+      # Derived from Devise.password_length rather than hard-coded, so tuning
+      # the minimum in config/initializers/devise.rb does not break this spec —
+      # it still proves the rule is enforced at whatever length is configured.
+      too_short = "a" * (Devise.password_length.min - 1)
+
       post user_registration_path, params: {
-        user: { email: "short@example.com", password: "short", password_confirmation: "short" }
+        user: { email: "short@example.com",
+                password: too_short, password_confirmation: too_short }
       }
 
       expect(User.find_by(email: "short@example.com")).to be_nil
@@ -40,16 +49,7 @@ RSpec.describe "Authentication" do
   end
 
   describe "signing in" do
-    it "refuses an unconfirmed account" do
-      user = create(:user, :unconfirmed)
-
-      post user_session_path, params: { user: { email: user.email, password: "password1234" } }
-
-      get dashboard_path
-      expect(response).to redirect_to(new_user_session_path)
-    end
-
-    it "admits a confirmed account" do
+    it "admits a brand new account with no confirmation step" do
       user = create(:user, :with_team)
 
       post user_session_path, params: { user: { email: user.email, password: "password1234" } }
@@ -64,18 +64,6 @@ RSpec.describe "Authentication" do
 
       get dashboard_path
       expect(response).to redirect_to(new_user_session_path)
-    end
-  end
-
-  describe "confirming" do
-    it "confirms with a valid token and then allows sign-in" do
-      user = create(:user, :unconfirmed)
-      token = user.send(:generate_confirmation_token)
-      user.save!(validate: false)
-
-      get user_confirmation_path(confirmation_token: token)
-
-      expect(user.reload.confirmed_at).to be_present
     end
   end
 

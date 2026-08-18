@@ -91,6 +91,28 @@ app/
   assets/stylesheets/  SASS design system
 ```
 
+### Authentication
+
+Devise, without `:confirmable`. **Email addresses are not verified** — an
+account works the moment it is created, and there is no confirmation step
+between signing up and using the product.
+
+That is a deliberate onboarding trade-off, and it has consequences worth
+knowing before you ship:
+
+- Anyone can sign up with an address they do not control
+- A typo'd address means password reset silently goes to a stranger
+- Changing an account's email is not verified either
+
+Two things compensate. `config.send_email_changed_notification` is on, so the
+*previous* address is told whenever the email changes — a hijacked account
+still produces a signal its real owner can act on. And password reset remains
+token-based, so it proves control of the address at the moment it matters.
+
+To require verification again: add `:confirmable` back to `User`, restore the
+four columns (the `RemoveConfirmableFromUsers` migration reverses cleanly), and
+set `config.allow_unconfirmed_access_for = 0.days`.
+
 ### Roles
 
 A `Membership` gives a user a role in one team: `owner`, `admin`, or `member`.

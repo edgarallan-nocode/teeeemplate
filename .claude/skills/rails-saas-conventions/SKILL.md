@@ -119,6 +119,23 @@ def checkout? = owner? && !impersonating?
 
 ---
 
+## 2a. Authentication
+
+Devise without `:confirmable`. **Email addresses are not verified.** An account
+is usable the moment it is created.
+
+Do not reintroduce a confirmation gate on sign-up without being asked — the
+onboarding flow assumes a new user is signed in immediately and sent to team
+creation.
+
+Because addresses are unverified, do not treat `user.email` as proof of
+identity or of control of that mailbox. If a feature needs a verified address
+(billing disputes, a security-sensitive notification), verify it explicitly for
+that feature rather than assuming Devise did.
+
+`config.send_email_changed_notification` is on and must stay on: it is the only
+signal a hijacked account gives its real owner.
+
 ## 3. Service objects
 
 A service is for a **multi-step operation** that touches more than one model or

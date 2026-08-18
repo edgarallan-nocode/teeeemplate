@@ -6,9 +6,6 @@
 #
 #  id                     :bigint           not null, primary key
 #  admin                  :boolean          default(FALSE), not null
-#  confirmation_sent_at   :datetime
-#  confirmation_token     :string
-#  confirmed_at           :datetime
 #  current_sign_in_at     :datetime
 #  current_sign_in_ip     :string
 #  email                  :string           default(""), not null
@@ -21,7 +18,6 @@
 #  reset_password_sent_at :datetime
 #  reset_password_token   :string
 #  sign_in_count          :integer          default(0), not null
-#  unconfirmed_email      :string
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #  last_team_id           :bigint
@@ -29,7 +25,6 @@
 # Indexes
 #
 #  index_users_on_admin                 (admin) WHERE admin
-#  index_users_on_confirmation_token    (confirmation_token) UNIQUE
 #  index_users_on_email                 (email) UNIQUE
 #  index_users_on_last_team_id          (last_team_id)
 #  index_users_on_reset_password_token  (reset_password_token) UNIQUE
@@ -39,8 +34,11 @@
 #  fk_rails_...  (last_team_id => teams.id) ON DELETE => nullify
 #
 class User < ApplicationRecord
+  # No :confirmable. An account is usable the moment it is created; email
+  # addresses are not verified. See the RemoveConfirmableFromUsers migration
+  # for what that trades away and how it is compensated for.
   devise :database_authenticatable, :registerable, :recoverable,
-         :rememberable, :validatable, :confirmable, :trackable
+         :rememberable, :validatable, :trackable
 
   has_many :memberships, dependent: :destroy
   has_many :teams, through: :memberships

@@ -133,7 +133,10 @@ Devise.setup do |config|
   # config.pepper = 'd66aed3c91e2e340fe176d99d60c6aa53b0d4c9ba20cdf3ce40e6d3776700bfc6ca42e89240689a1f9cbdffb88431ccf52272a52ed0f34dd80e4a1534c99ea16'
 
   # Send a notification to the original email when the user's email is changed.
-  # config.send_email_changed_notification = false
+  # Email addresses are not verified (no :confirmable), so notify the previous
+  # address whenever the email changes. If an account is taken over and the
+  # attacker changes the email, the real owner still finds out.
+  config.send_email_changed_notification = true
 
   # Send a notification email when the user's password is changed.
   # config.send_password_change_notification = false
@@ -147,8 +150,7 @@ Devise.setup do |config|
   # without confirming their account.
   # Default is 0.days, meaning the user cannot access the website without
   # confirming their account.
-  # Confirmation is required before sign-in. No grace period.
-  config.allow_unconfirmed_access_for = 0.days
+  # config.allow_unconfirmed_access_for = 2.days
 
   # A period that the user is allowed to confirm their account before their
   # token becomes invalid. For example, if set to 3.days, the user can confirm
@@ -156,13 +158,13 @@ Devise.setup do |config|
   # their account can't be confirmed with the token any more.
   # Default is nil, meaning there is no restriction on how long a user can take
   # before confirming their account.
-  config.confirm_within = 3.days
+  # config.confirm_within = 3.days
 
   # If true, requires any email changes to be confirmed (exactly the same way as
   # initial account confirmation) to be applied. Requires additional unconfirmed_email
   # db field (see migrations). Until confirmed, new email is stored in
   # unconfirmed_email column, and copied to email column on successful confirmation.
-  config.reconfirmable = true
+  # config.reconfirmable = true
 
   # Defines which key will be used when confirming an account
   # config.confirmation_keys = [:email]
@@ -183,7 +185,7 @@ Devise.setup do |config|
 
   # ==> Configuration for :validatable
   # Range for password length.
-  config.password_length = 10..128
+  config.password_length = 5..128
 
   # Email regex used to validate email formats. It simply asserts that
   # one (and only one) @ exists in the given string. This is mainly

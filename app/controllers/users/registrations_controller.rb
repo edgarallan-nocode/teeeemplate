@@ -13,12 +13,8 @@ module Users
 
     private
 
-    def after_inactive_sign_up_path_for(_resource)
-      # Confirmation is required before sign-in, so land somewhere that explains
-      # what happens next rather than bouncing to a login form.
-      new_user_session_path
-    end
-
+    # Accounts are active immediately, so a new user is signed in and sent
+    # straight to team creation by the dashboard's team requirement.
     def after_sign_up_path_for(_resource) = dashboard_path
   end
 end

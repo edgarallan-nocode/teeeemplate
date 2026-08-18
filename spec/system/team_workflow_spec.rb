@@ -99,7 +99,7 @@ RSpec.describe "Team workflow" do
     expect(page).to have_no_button("Accept invitation")
   end
 
-  it "signs up, confirms, and signs in" do
+  it "signs up and lands straight in team creation" do
     visit new_user_registration_path
 
     fill_in "First name", with: "Newly"
@@ -109,16 +109,8 @@ RSpec.describe "Team workflow" do
     fill_in "Confirm password", with: password
     click_button "Create account"
 
-    user = User.find_by(email: "newly@example.com")
-    expect(user).to be_present
-    expect(user.confirmed_at).to be_nil
-
-    # Confirm the way the emailed link would.
-    token = user.confirmation_token
-    visit user_confirmation_path(confirmation_token: token)
-    expect(user.reload.confirmed_at).to be_present
-
-    sign_in_through_form(user)
+    # No confirmation step and no second sign-in: the account is usable at once.
+    expect(User.find_by(email: "newly@example.com")).to be_present
     expect(page).to have_content("Create a team")
   end
 end

@@ -5,12 +5,7 @@
 <p style="margin:0 0 16px;">Hello <%= @resource.name %>,</p>
 
 <p style="margin:0 0 16px;">
-  <% if @resource.try(:unconfirmed_email?) %>
-    Your address is being changed to <strong><%= @resource.unconfirmed_email %></strong>.
-    Confirm it from the email we sent there.
-  <% else %>
-    Your address has been changed to <strong><%= @resource.email %></strong>.
-  <% end %>
+  Your address has been changed to <strong><%= @resource.email %></strong>.
 </p>
 
 <p style="margin:0; font-size:13px; color:#5a5a58;">

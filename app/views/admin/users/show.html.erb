@@ -61,8 +61,8 @@
     <dl class="detail-list">
       <dt>Platform admin</dt>
       <dd><%= @user.admin? ? "Yes" : "No" %></dd>
-      <dt>Confirmed</dt>
-      <dd><%= short_datetime(@user.confirmed_at) %></dd>
+      <dt>Joined</dt>
+      <dd><%= short_datetime(@user.created_at) %></dd>
       <dt>Sign-ins</dt>
       <dd class="numeric"><%= @user.sign_in_count %></dd>
       <dt>Last seen</dt>

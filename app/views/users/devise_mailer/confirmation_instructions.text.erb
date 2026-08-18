@@ -1,9 +1,0 @@
-Confirm your email
-
-Hello <%= @resource.name %>,
-
-Confirm this address to finish setting up your account:
-
-<%= confirmation_url(@resource, confirmation_token: @token) %>
-
-This link expires in <%= distance_of_time_in_words(Devise.confirm_within) %>.

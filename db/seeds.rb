@@ -18,7 +18,6 @@ def upsert_user!(email, first_name:, last_name:, admin: false)
     user.first_name = first_name
     user.last_name = last_name
     user.admin = admin
-    user.confirmed_at = Time.current
   end
 end
 
