@@ -9,6 +9,11 @@
     <%# Platform administration must never be indexed or cached. %>
     <meta name="robots" content="noindex, nofollow">
 
+
+    <%# Preload the Latin subset. The stylesheet only discovers the font after %>
+    <%# it parses @font-face, by which time headings have already painted in %>
+    <%# the fallback — this starts the download with the stylesheet instead. %>
+    <%= preload_link_tag "lexend-deca-latin.woff2", as: "font", type: "font/woff2", crossorigin: "anonymous" %>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
   </head>

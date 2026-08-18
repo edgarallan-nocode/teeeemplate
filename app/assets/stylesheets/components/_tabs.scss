@@ -24,7 +24,7 @@
 
   &[aria-selected="true"] {
     color: var(--ink);
-    font-weight: 600;
+    font-weight: var(--weight-bold);
     border-bottom-color: var(--ink);
   }
 }

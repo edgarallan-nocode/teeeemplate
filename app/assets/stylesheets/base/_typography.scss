@@ -22,7 +22,7 @@ h3 { font-size: var(--text-lg); }
 h4 {
   font-family: var(--font-body);
   font-size: var(--text-md);
-  font-weight: 600;
+  font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-normal);
 }
 
@@ -47,7 +47,7 @@ a {
   &:focus-visible { @include focus-ring; }
 }
 
-strong, b { font-weight: 600; }
+strong, b { font-weight: var(--weight-bold); }
 
 small { font-size: var(--text-sm); }
 

@@ -182,7 +182,12 @@ pages/       the few things truly specific to one screen
 - Add new partials to `application.scss` by hand. The import order is part of
   the design; there is no glob
 - Use the tokens in `abstracts/_variables.scss`. Do not hard-code a colour, a
-  font size, or a spacing value
+  font size, a font weight, or a spacing value
+- **Type is one family: Lexend Deca**, self-hosted in `app/assets/fonts` and
+  declared in `base/_fonts.scss`. Display and body differ by weight, size and
+  tracking, not by typeface. Do not add a second family, and do not load fonts
+  from a CDN — a third-party font request is render-blocking and sends visitor
+  IPs to that provider
 - Semantic class names (`.table__primary`, `.btn--ghost`), never utility soup
 - **No Tailwind, ever**
 

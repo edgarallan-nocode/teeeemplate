@@ -41,7 +41,7 @@
 }
 
 .table__primary {
-  font-weight: 600;
+  font-weight: var(--weight-bold);
   color: var(--ink);
 }
 

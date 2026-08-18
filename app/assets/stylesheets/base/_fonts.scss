@@ -1,0 +1,43 @@
+// Lexend Deca, self-hosted.
+//
+// Not loaded from Google's CDN, deliberately:
+//   * a third-party request on every page load is render-blocking
+//   * serving fonts from fonts.gstatic.com exposes visitor IPs to Google,
+//     which EU courts have found to be a GDPR problem
+//   * a self-hosted file cannot change or disappear underneath the design
+//
+// The files live in app/assets/fonts and are fingerprinted by Propshaft, so
+// they can be cached forever. `url()` takes a bare filename — Propshaft
+// resolves it against the asset load path and rewrites it to the digested
+// path at build time.
+//
+// This is one variable font covering weights 100–900, so every weight the
+// design uses costs nothing extra to download.
+//
+// To update: refetch from Google Fonts, replace the .woff2 files, and bump
+// the unicode-range blocks below if the subsets change.
+
+@font-face {
+  font-family: "Lexend Deca";
+  font-style: normal;
+  font-weight: 100 900;
+  // swap, not block: text renders immediately in the fallback and is replaced
+  // when the font arrives. A blank page is worse than a brief reflow.
+  font-display: swap;
+  src: url("lexend-deca-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+                 U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122,
+                 U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Lexend Deca";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("lexend-deca-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+                 U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF,
+                 U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F,
+                 U+A720-A7FF;
+}

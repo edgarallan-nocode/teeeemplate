@@ -134,6 +134,16 @@ border radius, no gradients, no decorative shadows. Change
 `abstracts/_variables.scss` and the whole application follows, including dark
 mode.
 
+Type is **Lexend Deca**, self-hosted in `app/assets/fonts` — one variable file
+covering weights 100–900, fingerprinted by Propshaft and preloaded in the
+layout. Nothing is fetched from a font CDN: that would be a render-blocking
+third-party request, and serving Google Fonts from Google exposes visitor IPs
+in a way EU courts have found to be a GDPR problem. Headings and body share the
+family and are distinguished by weight and tracking.
+
+Email is the exception. Mail clients strip `@font-face` unpredictably, so the
+templates use a system sans stack chosen to match Lexend Deca's fallback.
+
 ## Billing
 
 Billing belongs to the **team**, never to a user. Subscriptions are **per seat**:

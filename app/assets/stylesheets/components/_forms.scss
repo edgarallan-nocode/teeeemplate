@@ -9,7 +9,7 @@
   display: block;
   margin-bottom: var(--space-2);
   font-size: var(--text-sm);
-  font-weight: 600;
+  font-weight: var(--weight-bold);
 }
 
 .field__hint {
@@ -144,7 +144,7 @@
   color: var(--critical);
 
   &__title {
-    font-weight: 600;
+    font-weight: var(--weight-bold);
     margin-bottom: var(--space-2);
   }
 
