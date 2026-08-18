@@ -1,4 +1,6 @@
-web: bin/rails server --port ${PORT:-3000}
+# PORT comes from foreman, which bin/dev pins with -p. Do not add a default
+# here: it would mask a wrong port rather than surface it.
+web: bin/rails server --port $PORT
 js: npm run build:watch
 css: npm run build:css:watch
 worker: bundle exec sidekiq -C config/sidekiq.yml

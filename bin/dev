@@ -42,4 +42,7 @@ if ! (redis-cli ping >/dev/null 2>&1); then
   note "Redis is not responding. Sidekiq will keep retrying, and background jobs will not run."
 fi
 
-exec foreman start -f Procfile.dev "$@"
+# -p is not optional. foreman exports its own PORT to every process, starting
+# at 5000, so without this the web process reads PORT=5000 and quietly serves
+# somewhere other than where the README says it will.
+exec foreman start -f Procfile.dev -p "$PORT" "$@"
