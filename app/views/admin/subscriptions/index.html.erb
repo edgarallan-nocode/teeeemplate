@@ -1,0 +1,48 @@
+<% content_for :title, "Subscriptions" %>
+
+<%= page_title "Subscriptions", description: "#{number_with_delimiter @page.total_count} total." %>
+
+<%= form_with url: admin_subscriptions_path, method: :get, class: "filter-bar",
+      data: { controller: "autosubmit", action: "change->autosubmit#submit" } do %>
+  <%= select_tag :status,
+        options_for_select([["All statuses", ""]] + @statuses.map { |s| [s.tr("_", " ").capitalize, s] }, params[:status]),
+        class: "select" %>
+  <noscript><%= submit_tag "Filter", class: "btn btn--sm" %></noscript>
+<% end %>
+
+<% if @page.any? %>
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Team</th>
+          <th>Plan</th>
+          <th>Status</th>
+          <th class="is-numeric">Seats</th>
+          <th class="is-numeric">Renews</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @page.each do |subscription| %>
+          <tr>
+            <td>
+              <%= link_to subscription.team.name, admin_team_path(subscription.team), class: "table__primary" %>
+              <span class="table__secondary"><code><%= subscription.stripe_subscription_id %></code></span>
+            </td>
+            <td><%= subscription.plan_name %></td>
+            <td><%= subscription_badge(subscription) %></td>
+            <td class="is-numeric numeric"><%= subscription.quantity %></td>
+            <td class="is-numeric quiet"><%= short_date(subscription.current_period_end) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <%= render "shared/pagination", page: @page %>
+<% else %>
+  <div class="empty">
+    <p class="empty__title">No subscriptions</p>
+    <p>Nothing matches this filter.</p>
+  </div>
+<% end %>

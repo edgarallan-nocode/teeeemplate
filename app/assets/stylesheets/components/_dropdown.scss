@@ -1,0 +1,56 @@
+@use "../abstracts/mixins" as *;
+
+.dropdown { position: relative; }
+
+.dropdown__menu {
+  position: absolute;
+  z-index: 50;
+  top: calc(100% + var(--space-2));
+  right: 0;
+  min-width: 13rem;
+  padding: var(--space-2) 0;
+  background-color: var(--paper-raised);
+  border: var(--border-strong);
+  // The one place a shadow is allowed: it separates a floating layer from the
+  // page rather than decorating a static box.
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.dropdown__menu[hidden] { display: none; }
+
+.dropdown__menu--left { right: auto; left: 0; }
+
+.dropdown__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-2) var(--space-4);
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font-size: var(--text-sm);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover { background-color: var(--paper-sunken); }
+  &:focus-visible { @include focus-ring; outline-offset: -2px; }
+
+  &[aria-current="true"] { font-weight: 600; }
+}
+
+.dropdown__item--danger { color: var(--critical); }
+
+.dropdown__label {
+  @include label;
+  display: block;
+  padding: var(--space-2) var(--space-4);
+}
+
+.dropdown__divider {
+  height: 0;
+  margin: var(--space-2) 0;
+  border: 0;
+  border-top: var(--border);
+}

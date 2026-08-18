@@ -1,0 +1,47 @@
+<% content_for :title, "Delete your account" %>
+
+<div class="container--narrow section">
+  <p class="eyebrow">Account</p>
+  <h1>Delete your account</h1>
+
+  <% if @blocking_teams.any? %>
+    <%# Blocked, and told exactly why and what to do about it. %>
+    <div class="alert alert--alert" style="margin-top: var(--space-5);">
+      <div class="alert__body">
+        <p><strong>This cannot be done yet.</strong></p>
+        <p style="margin-top: var(--space-2);">
+          You are the only owner of
+          <%= @blocking_teams.map(&:name).to_sentence %>, and other people are
+          still members. Promote another owner, or delete the team, first.
+        </p>
+      </div>
+    </div>
+
+    <div class="button-row" style="margin-top: var(--space-5);">
+      <% @blocking_teams.each do |team| %>
+        <%= link_to "Manage #{team.name}", team_members_path(team), class: "btn" %>
+      <% end %>
+      <%= link_to "Back to account", account_path, class: "btn btn--ghost" %>
+    </div>
+  <% else %>
+    <p class="lede" style="margin-top: var(--space-4);">
+      This is permanent. Your account, your memberships, and any team you solely
+      own with no other members will be deleted.
+    </p>
+
+    <%= form_with url: account_path, method: :delete, class: "form",
+          style: "margin-top: var(--space-6);" do %>
+      <div class="field">
+        <%= label_tag :current_password, "Confirm your password", class: "field__label" %>
+        <%= password_field_tag :current_password, nil, autocomplete: "current-password",
+              class: "input", autofocus: true %>
+      </div>
+
+      <div class="form-actions">
+        <%= submit_tag "Delete my account permanently", class: "btn btn--danger",
+              data: { turbo_confirm: "This permanently deletes your account. Continue?" } %>
+        <%= link_to "Cancel", account_path, class: "btn btn--ghost" %>
+      </div>
+    <% end %>
+  <% end %>
+</div>

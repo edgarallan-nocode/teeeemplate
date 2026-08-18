@@ -1,0 +1,39 @@
+<% content_for :title, "Teams" %>
+
+<%= page_title "Teams", description: "#{number_with_delimiter @page.total_count} total." %>
+
+<%= form_with url: admin_teams_path, method: :get, class: "filter-bar",
+      data: { controller: "autosubmit", action: "input->autosubmit#submit" } do %>
+  <%= search_field_tag :q, params[:q], placeholder: "Search name or slug", class: "input" %>
+  <noscript><%= submit_tag "Search", class: "btn btn--sm" %></noscript>
+<% end %>
+
+<div class="table-wrap">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Team</th>
+        <th class="is-numeric">Members</th>
+        <th>Subscription</th>
+        <th class="is-numeric">Seats</th>
+        <th class="is-numeric">Created</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @page.each do |team| %>
+        <tr>
+          <td>
+            <%= link_to team.name, admin_team_path(team), class: "table__primary" %>
+            <span class="table__secondary"><%= team.slug %></span>
+          </td>
+          <td class="is-numeric numeric"><%= team.memberships.size %></td>
+          <td><%= subscription_badge(team.subscription) %></td>
+          <td class="is-numeric numeric"><%= team.subscription&.quantity || "—" %></td>
+          <td class="is-numeric quiet"><%= short_date(team.created_at) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<%= render "shared/pagination", page: @page %>

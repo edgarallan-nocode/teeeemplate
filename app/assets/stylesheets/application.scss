@@ -1,0 +1,31 @@
+// Manifest only. Every rule lives in a partial, grouped by what it is:
+//
+//   abstracts/  tokens, mixins, breakpoints — produce no CSS on their own
+//   base/       element-level defaults
+//   components/ reusable pieces, named for what they are
+//   pages/      the few things genuinely specific to one screen
+//
+// Add a partial here when you add one. There is no glob import, on purpose:
+// the load order is part of the design.
+
+@use "abstracts/variables";
+@use "abstracts/breakpoints";
+@use "abstracts/mixins";
+
+@use "base/reset";
+@use "base/typography";
+@use "base/layout";
+
+@use "components/buttons";
+@use "components/forms";
+@use "components/tables";
+@use "components/alerts";
+@use "components/nav";
+@use "components/dropdown";
+@use "components/modal";
+@use "components/tabs";
+
+@use "pages/auth";
+@use "pages/marketing";
+@use "pages/admin";
+@use "pages/mailer";

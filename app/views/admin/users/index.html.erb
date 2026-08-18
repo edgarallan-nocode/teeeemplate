@@ -1,0 +1,42 @@
+<% content_for :title, "Users" %>
+
+<%= page_title "Users", description: "#{number_with_delimiter @page.total_count} total." %>
+
+<%= form_with url: admin_users_path, method: :get, class: "filter-bar",
+      data: { controller: "autosubmit", action: "input->autosubmit#submit" } do %>
+  <%= search_field_tag :q, params[:q], placeholder: "Search name or email", class: "input" %>
+  <noscript><%= submit_tag "Search", class: "btn btn--sm" %></noscript>
+<% end %>
+
+<div class="table-wrap">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>User</th>
+        <th>Teams</th>
+        <th>Status</th>
+        <th class="is-numeric">Joined</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @page.each do |user| %>
+        <tr>
+          <td>
+            <%= link_to user.name, admin_user_path(user), class: "table__primary" %>
+            <span class="table__secondary"><%= user.email %></span>
+          </td>
+          <td class="numeric"><%= user.memberships.size %></td>
+          <td>
+            <% if user.admin? %><span class="badge badge--accent">Admin</span><% end %>
+            <% if user.confirmed_at.nil? %>
+              <span class="badge badge--caution">Unconfirmed</span>
+            <% end %>
+          </td>
+          <td class="is-numeric quiet"><%= short_date(user.created_at) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<%= render "shared/pagination", page: @page %>

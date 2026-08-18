@@ -1,0 +1,38 @@
+<% content_for :title, "Sign in" %>
+
+<div class="auth">
+  <div class="auth__panel">
+    <h1 class="auth__title">Sign in</h1>
+    <p class="auth__subtitle">Welcome back.</p>
+
+    <%= form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: "form" }) do |f| %>
+      <div class="field">
+        <%= f.label :email, class: "field__label" %>
+        <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "input" %>
+      </div>
+
+      <div class="field">
+        <%= f.label :password, class: "field__label" %>
+        <%= f.password_field :password, autocomplete: "current-password", class: "input" %>
+      </div>
+
+      <% if devise_mapping.rememberable? %>
+        <div class="field">
+          <label class="choice">
+            <%= f.check_box :remember_me, class: "choice__control" %>
+            <span class="choice__text">Stay signed in on this device</span>
+          </label>
+        </div>
+      <% end %>
+
+      <div class="form-actions">
+        <%= f.submit "Sign in", class: "btn btn--primary btn--block" %>
+      </div>
+    <% end %>
+
+    <div class="auth__footer">
+      <%= link_to "Create an account", new_registration_path(resource_name) %>
+      <%= link_to "Forgot your password?", new_password_path(resource_name) %>
+    </div>
+  </div>
+</div>

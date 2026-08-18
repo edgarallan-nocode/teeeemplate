@@ -1,0 +1,16 @@
+<h1 style="margin:0 0 16px; font-family:Georgia,serif; font-size:22px; font-weight:normal; color:#111111;">
+  Your trial ends soon
+</h1>
+
+<p style="margin:0 0 16px;">
+  The trial for <strong><%= @team.name %></strong> ends on
+  <strong><%= @ends_at&.to_date&.to_fs(:long) %></strong>.
+</p>
+
+<p style="margin:0 0 16px;">
+  You will then be billed for
+  <%= pluralize(@team.seat_count, "seat") %> at your plan's rate. No action is
+  needed if that is what you want.
+</p>
+
+<%= render "shared/email_button", url: billing_subscription_url, label: "Review billing" %>

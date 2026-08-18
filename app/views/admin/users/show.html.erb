@@ -1,0 +1,84 @@
+<% content_for :title, @user.name %>
+
+<%= page_title @user.name, description: @user.email do %>
+  <% if policy(@user).impersonate? %>
+    <%= button_to "Impersonate", admin_impersonations_path(user_id: @user.id),
+          class: "btn btn--danger",
+          form: { data: { turbo_confirm: "Impersonate #{@user.name}? This is recorded in the audit log." } } %>
+  <% end %>
+<% end %>
+
+<div class="split">
+  <div class="stack--loose stack">
+    <section>
+      <h2>Teams</h2>
+      <div class="table-wrap" style="margin-top: var(--space-4);">
+        <table class="table">
+          <thead>
+            <tr><th>Team</th><th>Role</th><th>Subscription</th><th class="is-numeric">Joined</th></tr>
+          </thead>
+          <tbody>
+            <% @memberships.each do |membership| %>
+              <tr>
+                <td><%= link_to membership.team.name, admin_team_path(membership.team), class: "table__primary" %></td>
+                <td><%= role_badge(membership) %></td>
+                <td><%= subscription_badge(membership.team.subscription) %></td>
+                <td class="is-numeric quiet"><%= short_date(membership.created_at) %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <% if @impersonations.any? %>
+      <section>
+        <h2>Impersonation history</h2>
+        <div class="table-wrap" style="margin-top: var(--space-4);">
+          <table class="table">
+            <thead>
+              <tr><th>Administrator</th><th>Started</th><th>Ended</th><th>From</th></tr>
+            </thead>
+            <tbody>
+              <% @impersonations.each do |event| %>
+                <tr>
+                  <td class="table__primary"><%= event.admin.name %></td>
+                  <td class="quiet"><%= short_datetime(event.started_at) %></td>
+                  <td class="quiet">
+                    <%= event.active? ? tag.span("Still active", class: "badge badge--critical") : short_datetime(event.ended_at) %>
+                  </td>
+                  <td class="quiet"><%= event.ip_address %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    <% end %>
+  </div>
+
+  <aside>
+    <dl class="detail-list">
+      <dt>Platform admin</dt>
+      <dd><%= @user.admin? ? "Yes" : "No" %></dd>
+      <dt>Confirmed</dt>
+      <dd><%= short_datetime(@user.confirmed_at) %></dd>
+      <dt>Sign-ins</dt>
+      <dd class="numeric"><%= @user.sign_in_count %></dd>
+      <dt>Last seen</dt>
+      <dd><%= short_datetime(@user.last_sign_in_at) %></dd>
+      <dt>Last IP</dt>
+      <dd class="quiet"><%= @user.last_sign_in_ip || "—" %></dd>
+    </dl>
+
+    <% unless policy(@user).impersonate? %>
+      <p class="field__hint" style="margin-top: var(--space-4);">
+        <% if @user.admin? %>
+          Administrators cannot be impersonated.
+        <% else %>
+          You cannot impersonate yourself.
+        <% end %>
+      </p>
+    <% end %>
+  </aside>
+</div>

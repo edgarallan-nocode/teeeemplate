@@ -1,0 +1,20 @@
+# PostgreSQL only. Development and test use local socket auth; production is
+# driven entirely by DATABASE_URL, which Hatchbox provides.
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  max_connections: <%= ENV.fetch("RAILS_MAX_THREADS", 5) %>
+
+development:
+  <<: *default
+  database: <%= ENV.fetch("DATABASE_NAME", "teeeemplate_development") %>
+
+test:
+  <<: *default
+  database: <%= ENV.fetch("TEST_DATABASE_NAME", "teeeemplate_test") %>
+
+# Production reads DATABASE_URL. Rails merges it over anything below, so there
+# is deliberately nothing here to get out of sync with the deploy.
+production:
+  <<: *default
+  database: teeeemplate_production

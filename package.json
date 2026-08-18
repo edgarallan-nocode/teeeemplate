@@ -1,0 +1,22 @@
+{
+  "name": "teeeemplate",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node esbuild.config.mjs",
+    "build:watch": "node esbuild.config.mjs --watch",
+    "build:css": "sass ./app/assets/stylesheets/application.scss:./app/assets/builds/application.css --no-source-map --load-path=node_modules --quiet-deps",
+    "build:css:watch": "npm run build:css -- --watch"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0",
+    "sass": "^1.83.0"
+  },
+  "dependencies": {
+    "@hotwired/stimulus": "^3.2.2",
+    "@hotwired/turbo-rails": "^8.0.12"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

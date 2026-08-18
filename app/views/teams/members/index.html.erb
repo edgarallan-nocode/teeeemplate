@@ -1,0 +1,129 @@
+<% content_for :title, "Members" %>
+
+<%= page_title "Members", description: "#{pluralize(@memberships.size, 'person')} in #{@team.name}." %>
+
+<nav class="subnav" aria-label="Team">
+  <% if policy(@team).update? %>
+    <%= link_to "Settings", edit_team_path(@team), class: "nav-link" %>
+  <% end %>
+  <%= link_to "Members", team_members_path(@team), class: "nav-link", "aria-current": "page" %>
+  <% if policy(billing_subject_for(@team)).show? %>
+    <%= link_to "Billing", billing_subscription_path, class: "nav-link" %>
+  <% end %>
+</nav>
+
+<div class="split">
+  <div class="stack--loose stack">
+    <section>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Member</th>
+              <th>Role</th>
+              <th class="is-numeric">Joined</th>
+              <th class="is-actions"><span class="visually-hidden">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @memberships.each do |membership| %>
+              <tr>
+                <td>
+                  <span class="table__primary"><%= membership.user.name %></span>
+                  <span class="table__secondary"><%= membership.user.email %></span>
+                </td>
+                <td>
+                  <% if policy(membership).update? %>
+                    <%= form_with model: membership, url: team_member_path(@team, membership),
+                          method: :patch, data: { controller: "autosubmit", action: "change->autosubmit#submit" } do |f| %>
+                      <%= f.select :role,
+                            policy(membership).assignable_roles.map { |r| [Membership::ROLE_LABELS[r], r] },
+                            {}, class: "select", style: "min-width: 8rem;" %>
+                      <noscript><%= f.submit "Update", class: "btn btn--sm" %></noscript>
+                    <% end %>
+                  <% else %>
+                    <%= role_badge(membership) %>
+                  <% end %>
+                </td>
+                <td class="is-numeric quiet"><%= short_date(membership.created_at) %></td>
+                <td class="is-actions">
+                  <% if policy(membership).destroy? %>
+                    <%= button_to "Remove", team_member_path(@team, membership), method: :delete,
+                          class: "btn-link btn-link--danger",
+                          form: { data: { turbo_confirm: "Remove #{membership.user.name} from #{@team.name}?" } } %>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <% if @invitations.any? %>
+      <section class="panel">
+        <div class="panel__header"><h2>Pending invitations</h2></div>
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Email</th>
+                <th>Role</th>
+                <th class="is-numeric">Expires</th>
+                <th class="is-actions"><span class="visually-hidden">Actions</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @invitations.each do |invitation| %>
+                <tr>
+                  <td class="table__primary"><%= invitation.email %></td>
+                  <td><span class="badge badge--quiet"><%= invitation.role %></span></td>
+                  <td class="is-numeric quiet"><%= short_date(invitation.expires_at) %></td>
+                  <td class="is-actions">
+                    <div class="cluster cluster--end cluster--tight"
+                         data-controller="clipboard"
+                         data-clipboard-text-value="<%= invitation_url(invitation.token) %>">
+                      <button type="button" class="btn-link"
+                              data-clipboard-target="button"
+                              data-action="clipboard#copy">Copy link</button>
+                      <%= button_to "Revoke", team_invitation_path(@team, invitation),
+                            method: :delete, class: "btn-link btn-link--danger" %>
+                    </div>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    <% end %>
+  </div>
+
+  <aside>
+    <% if policy(TeamInvitation).create? %>
+      <section class="panel panel--sunken">
+        <div class="panel__header"><h2>Invite someone</h2></div>
+
+        <%= form_with model: @invitation, url: team_invitations_path(@team), class: "stack" do |f| %>
+          <div class="field">
+            <%= f.label :email, class: "field__label" %>
+            <%= f.email_field :email, class: "input", placeholder: "person@example.com" %>
+          </div>
+
+          <div class="field">
+            <%= f.label :role, class: "field__label" %>
+            <%= f.select :role,
+                  policy(TeamInvitation).invitable_roles.map { |r| [Membership::ROLE_LABELS[r], r] },
+                  {}, class: "select" %>
+          </div>
+
+          <%= f.submit "Send invitation", class: "btn btn--primary btn--block" %>
+        <% end %>
+
+        <p class="field__hint" style="margin-top: var(--space-4);">
+          Billing is per seat, so adding someone changes this team's bill.
+        </p>
+      </section>
+    <% end %>
+  </aside>
+</div>

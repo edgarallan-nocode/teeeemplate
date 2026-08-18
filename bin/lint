@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Style and security checks.
+#
+#   bin/lint          check only
+#   bin/lint --fix    autocorrect what RuboCop safely can, then check
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+say() { printf "\n\033[1m==> %s\033[0m\n" "$1"; }
+status=0
+
+say "RuboCop"
+if [ "${1:-}" = "--fix" ]; then
+  bundle exec rubocop --autocorrect || status=1
+else
+  bundle exec rubocop || status=1
+fi
+
+say "Brakeman"
+bundle exec brakeman --quiet --no-pager || status=1
+
+say "bundler-audit"
+bundle exec bundle-audit check --update || status=1
+
+exit "$status"

@@ -1,0 +1,12 @@
+Your email address was changed
+
+Hello <%= @resource.name %>,
+
+<% if @resource.try(:unconfirmed_email?) -%>
+Your address is being changed to <%= @resource.unconfirmed_email %>.
+Confirm it from the email we sent there.
+<% else -%>
+Your address has been changed to <%= @resource.email %>.
+<% end -%>
+
+If this was not you, contact <%= Rails.configuration.x.support_email %>.

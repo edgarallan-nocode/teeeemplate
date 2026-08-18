@@ -1,0 +1,61 @@
+<% content_for :title, "#{@team.name} settings" %>
+
+<%= page_title "Team settings", description: @team.name %>
+
+<nav class="subnav" aria-label="Team">
+  <%= link_to "Settings", edit_team_path(@team), class: "nav-link", "aria-current": "page" %>
+  <%= link_to "Members", team_members_path(@team), class: "nav-link" %>
+  <% if policy(billing_subject_for(@team)).show? %>
+    <%= link_to "Billing", billing_subscription_path, class: "nav-link" %>
+  <% end %>
+</nav>
+
+<div class="split">
+  <div>
+    <%= form_with model: @team, class: "form" do |f| %>
+      <%= render "shared/form_errors", record: @team %>
+
+      <div class="field">
+        <%= f.label :name, "Team name", class: "field__label" %>
+        <%= f.text_field :name, class: "input" %>
+      </div>
+
+      <div class="field">
+        <%= f.label :slug, "URL slug", class: "field__label" %>
+        <%= f.text_field :slug, class: "input" %>
+        <p class="field__hint">Lowercase letters, numbers and hyphens only.</p>
+      </div>
+
+      <div class="form-actions">
+        <%= f.submit "Save settings", class: "btn btn--primary" %>
+      </div>
+    <% end %>
+  </div>
+
+  <aside class="stack">
+    <% if policy(@team).leave? %>
+      <section class="panel panel--sunken">
+        <div class="panel__header"><h2>Leave team</h2></div>
+        <p class="muted">You will lose access to everything in <%= @team.name %>.</p>
+        <p style="margin-top: var(--space-4);">
+          <%= button_to "Leave #{@team.name}", team_leave_path(@team), class: "btn btn--sm",
+                form: { data: { turbo_confirm: "Leave #{@team.name}?" } } %>
+        </p>
+      </section>
+    <% end %>
+
+    <% if policy(@team).destroy? %>
+      <section class="panel" style="border-color: var(--critical);">
+        <div class="panel__header"><h2>Delete team</h2></div>
+        <p class="muted">
+          This permanently deletes <%= @team.name %>, its projects, its members'
+          access, and cancels billing. It cannot be undone.
+        </p>
+        <p style="margin-top: var(--space-4);">
+          <%= button_to "Delete #{@team.name}", @team, method: :delete, class: "btn btn--sm btn--danger",
+                form: { data: { turbo_confirm: "Type-check yourself: this permanently deletes #{@team.name} and everything in it. Continue?" } } %>
+        </p>
+      </section>
+    <% end %>
+  </aside>
+</div>

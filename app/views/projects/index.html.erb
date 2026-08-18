@@ -1,0 +1,54 @@
+<% content_for :title, "Projects" %>
+
+<%= page_title "Projects", description: "Scoped to #{current_team.name}." do %>
+  <% if policy(Project.new(team: current_team)).create? %>
+    <%= link_to "New project", new_project_path, class: "btn btn--primary" %>
+  <% end %>
+<% end %>
+
+<%= form_with url: projects_path, method: :get, class: "filter-bar",
+      data: { controller: "autosubmit", action: "input->autosubmit#submit" } do %>
+  <%= search_field_tag :q, params[:q], placeholder: "Search projects", class: "input" %>
+  <noscript><%= submit_tag "Search", class: "btn btn--sm" %></noscript>
+<% end %>
+
+<% if @page.any? %>
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Project</th>
+          <th>Created by</th>
+          <th class="is-numeric">Created</th>
+          <th class="is-actions"><span class="visually-hidden">Actions</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @page.each do |project| %>
+          <tr>
+            <td>
+              <%= link_to project.name, project, class: "table__primary" %>
+              <span class="table__secondary"><%= truncate(project.description, length: 80) %></span>
+            </td>
+            <td class="muted"><%= project.created_by&.name || "—" %></td>
+            <td class="is-numeric quiet"><%= short_date(project.created_at) %></td>
+            <td class="is-actions">
+              <% if policy(project).update? %>
+                <%= link_to "Edit", edit_project_path(project), class: "btn-link" %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <%= render "shared/pagination", page: @page %>
+<% else %>
+  <div class="empty">
+    <p class="empty__title"><%= params[:q].present? ? "Nothing matched" : "No projects yet" %></p>
+    <p>
+      <%= params[:q].present? ? "Try a different search." : "Create the first one to get started." %>
+    </p>
+  </div>
+<% end %>

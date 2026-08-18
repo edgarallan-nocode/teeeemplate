@@ -1,0 +1,30 @@
+<% content_for :title, "Confirming your subscription" %>
+
+<div class="container--narrow section--tall">
+  <p class="eyebrow">Billing</p>
+  <h1>Confirming your subscription</h1>
+
+  <%# Deliberately does NOT claim success. Landing on this page only means %>
+  <%# Stripe redirected the browser here — anyone could visit this URL. The %>
+  <%# subscription becomes real when the webhook arrives and                %>
+  <%# Billing::ProcessStripeEvent writes it.                                %>
+  <% if @subscription&.active? %>
+    <div class="alert alert--notice" style="margin-top: var(--space-5);">
+      <div class="alert__body">
+        Your <%= @subscription.plan_name %> subscription is active for
+        <%= pluralize(@subscription.quantity, "seat") %>.
+      </div>
+    </div>
+  <% else %>
+    <p class="lede" style="margin-top: var(--space-4);">
+      Stripe has taken your payment details. We are waiting for Stripe to
+      confirm the subscription, which usually takes a few seconds. Refresh this
+      page in a moment.
+    </p>
+  <% end %>
+
+  <div class="button-row" style="margin-top: var(--space-6);">
+    <%= link_to "Billing settings", billing_subscription_path, class: "btn btn--primary" %>
+    <%= link_to "Back to dashboard", dashboard_path, class: "btn btn--ghost" %>
+  </div>
+</div>

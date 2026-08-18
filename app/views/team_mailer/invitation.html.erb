@@ -1,0 +1,16 @@
+<h1 style="margin:0 0 16px; font-family:Georgia,serif; font-size:22px; font-weight:normal; color:#111111;">
+  Join <%= @team.name %>
+</h1>
+
+<p style="margin:0 0 16px;">
+  <strong><%= @inviter.name %></strong> has invited you to join
+  <strong><%= @team.name %></strong> as
+  <%= Membership::ROLE_LABELS[@invitation.role].downcase %>.
+</p>
+
+<%= render "shared/email_button", url: @accept_url, label: "Accept invitation" %>
+
+<p style="margin:0; font-size:13px; color:#5a5a58;">
+  This invitation expires on <%= @invitation.expires_at.to_date.to_fs(:long) %>.
+  You will need to sign in as <%= @invitation.email %> to accept it.
+</p>

@@ -1,0 +1,12 @@
+// Three breakpoints, mobile-first. More than this and nobody can remember
+// which one they are writing for.
+$bp-sm: 40rem;   // 640px  — phone landscape and up
+$bp-md: 52rem;   // 832px  — tablet and up
+$bp-lg: 68rem;   // 1088px — desktop and up
+
+@mixin sm { @media (min-width: $bp-sm) { @content; } }
+@mixin md { @media (min-width: $bp-md) { @content; } }
+@mixin lg { @media (min-width: $bp-lg) { @content; } }
+
+// For the handful of places where a max-width query genuinely reads better.
+@mixin below-md { @media (max-width: #{$bp-md - 0.01rem}) { @content; } }

@@ -1,0 +1,15 @@
+# Queue order is priority order. Sidekiq drains left to right.
+#
+#   critical — user-visible work that must not sit behind a backlog
+#   default  — ordinary application work
+#   mailers  — Action Mailer deliveries (Rails' own queue name)
+#   low      — bulk, reconciliation, and cleanup
+:concurrency: <%= ENV.fetch("SIDEKIQ_CONCURRENCY", 5) %>
+:queues:
+  - critical
+  - default
+  - mailers
+  - low
+
+production:
+  :concurrency: <%= ENV.fetch("SIDEKIQ_CONCURRENCY", 10) %>

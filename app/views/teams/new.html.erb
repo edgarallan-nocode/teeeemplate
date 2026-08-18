@@ -1,0 +1,27 @@
+<% content_for :title, "Create a team" %>
+
+<div class="container--narrow section">
+  <p class="eyebrow">Teams</p>
+  <h1>Create a team</h1>
+  <p class="lede" style="margin-top: var(--space-3);">
+    Everything in this application belongs to a team — projects, members and
+    billing. You will be its owner.
+  </p>
+
+  <%= form_with model: @team, class: "form", style: "margin-top: var(--space-6);" do |f| %>
+    <%= render "shared/form_errors", record: @team %>
+
+    <div class="field">
+      <%= f.label :name, "Team name", class: "field__label" %>
+      <%= f.text_field :name, autofocus: true, class: "input", placeholder: "Acme Widgets" %>
+      <p class="field__hint">A URL slug is generated from this. You can change it later.</p>
+    </div>
+
+    <div class="form-actions">
+      <%= f.submit "Create team", class: "btn btn--primary" %>
+      <% if available_teams.any? %>
+        <%= link_to "Cancel", dashboard_path, class: "btn btn--ghost" %>
+      <% end %>
+    </div>
+  <% end %>
+</div>

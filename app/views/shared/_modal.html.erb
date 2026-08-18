@@ -1,0 +1,9 @@
+<%# One modal frame for the whole application. Link to it with:            %>
+<%#   link_to "Edit", edit_thing_path(thing), data: { turbo_frame: "modal_content" } %>
+<div data-controller="modal">
+  <div class="modal" data-modal-target="container" data-action="click->modal#close" hidden>
+    <div class="modal__panel" data-action="click->modal#stopPropagation">
+      <turbo-frame id="modal_content" data-modal-target="content"></turbo-frame>
+    </div>
+  </div>
+</div>

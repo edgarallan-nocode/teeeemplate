@@ -1,0 +1,14 @@
+<h1 style="margin:0 0 16px; font-family:Georgia,serif; font-size:22px; font-weight:normal; color:#111111;">
+  Subscription canceled
+</h1>
+
+<p style="margin:0 0 16px;">
+  The subscription for <strong><%= @team.name %></strong> has been canceled.
+  Your data is still here — you can resubscribe at any time.
+</p>
+
+<%= render "shared/email_button", url: billing_subscription_url, label: "Resubscribe" %>
+
+<p style="margin:0; font-size:13px; color:#5a5a58;">
+  You are receiving this because you are an owner of <%= @team.name %>.
+</p>

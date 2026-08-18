@@ -1,0 +1,18 @@
+<%# Flash messages. Notices auto-dismiss; alerts stay until dismissed, because %>
+<%# a message about something going wrong should not vanish mid-read. %>
+<div class="toasts" role="status" aria-live="polite" id="flashes">
+  <% flash.each do |type, message| %>
+    <% next if message.blank? %>
+    <% error = type.to_s.in?(%w[alert error]) %>
+
+    <div class="alert alert--<%= type %>"
+         data-controller="flash"
+         data-flash-dismissible-value="<%= !error %>"
+         data-action="mouseenter->flash#pause mouseleave->flash#resume">
+      <div class="alert__body"><%= message %></div>
+      <button type="button" class="alert__dismiss"
+              data-action="flash#dismiss"
+              aria-label="Dismiss">&times;</button>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,84 @@
+<% content_for :title, @team.name %>
+
+<%= page_title @team.name, description: @team.slug %>
+
+<div class="split">
+  <div class="stack--loose stack">
+    <section>
+      <h2>Members</h2>
+      <div class="table-wrap" style="margin-top: var(--space-4);">
+        <table class="table">
+          <thead>
+            <tr><th>User</th><th>Role</th><th class="is-numeric">Joined</th></tr>
+          </thead>
+          <tbody>
+            <% @memberships.each do |membership| %>
+              <tr>
+                <td>
+                  <%= link_to membership.user.name, admin_user_path(membership.user), class: "table__primary" %>
+                  <span class="table__secondary"><%= membership.user.email %></span>
+                </td>
+                <td><%= role_badge(membership) %></td>
+                <td class="is-numeric quiet"><%= short_date(membership.created_at) %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <% if @invitations.any? %>
+      <section>
+        <h2>Invitations</h2>
+        <div class="table-wrap" style="margin-top: var(--space-4);">
+          <table class="table">
+            <thead>
+              <tr><th>Email</th><th>Role</th><th>Status</th><th class="is-numeric">Sent</th></tr>
+            </thead>
+            <tbody>
+              <% @invitations.each do |invitation| %>
+                <tr>
+                  <td class="table__primary"><%= invitation.email %></td>
+                  <td class="quiet"><%= invitation.role %></td>
+                  <td>
+                    <% if invitation.accepted? %>
+                      <span class="badge badge--positive">Accepted</span>
+                    <% elsif invitation.expired? %>
+                      <span class="badge badge--quiet">Expired</span>
+                    <% else %>
+                      <span class="badge badge--caution">Pending</span>
+                    <% end %>
+                  </td>
+                  <td class="is-numeric quiet"><%= short_date(invitation.created_at) %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    <% end %>
+  </div>
+
+  <aside>
+    <dl class="detail-list">
+      <dt>Subscription</dt>
+      <dd><%= subscription_badge(@subscription) %></dd>
+      <% if @subscription %>
+        <dt>Plan</dt>
+        <dd><%= @subscription.plan_name %></dd>
+        <dt>Seats billed</dt>
+        <dd class="numeric"><%= @subscription.quantity %></dd>
+        <dt>Renews</dt>
+        <dd><%= short_date(@subscription.current_period_end) %></dd>
+        <dt>Stripe subscription</dt>
+        <dd><code><%= @subscription.stripe_subscription_id %></code></dd>
+      <% end %>
+      <dt>Stripe customer</dt>
+      <dd><code><%= @team.stripe_customer_id || "—" %></code></dd>
+      <dt>Projects</dt>
+      <dd class="numeric"><%= @project_count %></dd>
+      <dt>Created</dt>
+      <dd><%= short_datetime(@team.created_at) %></dd>
+    </dl>
+  </aside>
+</div>

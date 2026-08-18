@@ -1,0 +1,46 @@
+<% content_for :title, "Join #{@invitation.team.name}" %>
+
+<div class="container--narrow section--tall">
+  <p class="eyebrow">Invitation</p>
+  <h1>Join <%= @invitation.team.name %></h1>
+
+  <p class="lede" style="margin-top: var(--space-4);">
+    <%= @invitation.invited_by.name %> invited
+    <strong><%= @invitation.email %></strong> to join as
+    <%= Membership::ROLE_LABELS[@invitation.role].downcase %>.
+  </p>
+
+  <div style="margin-top: var(--space-6);">
+    <% if @invitation.accepted? %>
+      <div class="alert alert--info">
+        <div class="alert__body">This invitation has already been accepted.</div>
+      </div>
+    <% elsif @invitation.expired? %>
+      <div class="alert alert--alert">
+        <div class="alert__body">
+          This invitation expired on <%= short_date(@invitation.expires_at) %>.
+          Ask <%= @invitation.invited_by.name %> to send a new one.
+        </div>
+      </div>
+    <% elsif @invitation.email != Current.user.email %>
+      <%# The signed-in account does not match the invited address. Say so %>
+      <%# plainly rather than failing with a generic error. %>
+      <div class="alert alert--alert">
+        <div class="alert__body">
+          This invitation was sent to <strong><%= @invitation.email %></strong>,
+          but you are signed in as <strong><%= Current.user.email %></strong>.
+          Sign in with the invited address to accept it.
+        </div>
+      </div>
+      <div class="button-row" style="margin-top: var(--space-5);">
+        <%= button_to "Sign out", destroy_user_session_path, method: :delete, class: "btn" %>
+      </div>
+    <% else %>
+      <div class="button-row">
+        <%= button_to "Accept invitation", accept_invitation_path(@invitation.token),
+              class: "btn btn--lg btn--primary" %>
+        <%= link_to "Not now", root_path, class: "btn btn--lg btn--ghost" %>
+      </div>
+    <% end %>
+  </div>
+</div>

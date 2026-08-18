@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# Everything CI runs, in the same order, locally.
+#
+# If this passes, the pull request should be green.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+say() { printf "\n\033[1m==> %s\033[0m\n" "$1"; }
+status=0
+
+say "RuboCop"
+bundle exec rubocop || status=1
+
+say "Brakeman"
+bundle exec brakeman --quiet --no-pager || status=1
+
+say "bundler-audit"
+bundle exec bundle-audit check --update || status=1
+
+say "Assets build"
+npm run build || status=1
+npm run build:css || status=1
+
+say "RSpec"
+RAILS_ENV=test bin/rails db:test:prepare
+bundle exec rspec || status=1
+
+if [ "$status" -eq 0 ]; then
+  printf "\n\033[32mAll checks passed.\033[0m\n"
+else
+  printf "\n\033[31mSome checks failed.\033[0m\n"
+fi
+
+exit "$status"

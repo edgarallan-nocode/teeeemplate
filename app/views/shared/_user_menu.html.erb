@@ -1,0 +1,24 @@
+<div class="dropdown" data-controller="dropdown">
+  <button type="button" class="btn btn--sm"
+          data-dropdown-target="button"
+          data-action="dropdown#toggle"
+          aria-haspopup="true"
+          aria-expanded="false">
+    <%= Current.user.initials %>
+  </button>
+
+  <div class="dropdown__menu" data-dropdown-target="menu" hidden>
+    <span class="dropdown__label"><%= Current.user.email %></span>
+
+    <%= link_to "Account settings", account_path, class: "dropdown__item" %>
+
+    <% if Current.true_user&.admin? && !Current.impersonating? %>
+      <hr class="dropdown__divider">
+      <%= link_to "Platform admin", admin_root_path, class: "dropdown__item" %>
+    <% end %>
+
+    <hr class="dropdown__divider">
+    <%= button_to "Sign out", destroy_user_session_path, method: :delete,
+          class: "dropdown__item dropdown__item--danger" %>
+  </div>
+</div>

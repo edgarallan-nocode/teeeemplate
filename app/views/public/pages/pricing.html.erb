@@ -1,0 +1,30 @@
+<% content_for :title, "Pricing" %>
+
+<section class="section">
+  <p class="eyebrow">Pricing</p>
+  <h1 class="display">Per seat, per month.</h1>
+  <p class="lede" style="margin-top: var(--space-5);">
+    Every plan is billed by the number of people in your team. Add someone and
+    the bill is prorated; remove them and it goes back down.
+  </p>
+</section>
+
+<section class="price-grid">
+  <% @plans.each do |plan| %>
+    <div class="price">
+      <p class="price__name"><%= plan.name %></p>
+      <p class="price__amount">
+        <%= plan.monthly_price %><span class="price__unit"> / seat / <%= plan.interval %></span>
+      </p>
+
+      <ul class="price__features">
+        <% plan.features.each do |feature| %>
+          <li><%= feature %></li>
+        <% end %>
+      </ul>
+
+      <%= link_to "Start with #{plan.name}", new_user_registration_path,
+            class: "btn #{'btn--primary' if plan.default}" %>
+    </div>
+  <% end %>
+</section>

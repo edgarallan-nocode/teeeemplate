@@ -1,0 +1,78 @@
+<% content_for :title, "Overview" %>
+
+<%= page_title "Platform overview" %>
+
+<div class="admin-stats">
+  <div class="stat">
+    <span class="stat__value numeric"><%= number_with_delimiter @user_count %></span>
+    <span class="stat__label">Users</span>
+  </div>
+  <div class="stat">
+    <span class="stat__value numeric"><%= number_with_delimiter @team_count %></span>
+    <span class="stat__label">Teams</span>
+  </div>
+  <div class="stat">
+    <span class="stat__value numeric"><%= number_with_delimiter @active_subscriptions %></span>
+    <span class="stat__label">Active subscriptions</span>
+  </div>
+  <div class="stat">
+    <span class="stat__value numeric"><%= number_with_delimiter @seats_billed %></span>
+    <span class="stat__label">Seats billed</span>
+  </div>
+</div>
+
+<% if @failed_events.positive? %>
+  <div class="alert alert--alert">
+    <div class="alert__body">
+      <%= pluralize(@failed_events, "Stripe webhook") %> failed to process.
+      Check the Sidekiq dead set and the <code>stripe_events</code> table.
+    </div>
+  </div>
+<% end %>
+
+<div class="split" style="margin-top: var(--space-6);">
+  <section class="panel">
+    <div class="panel__header">
+      <h2>Newest teams</h2>
+      <%= link_to "All teams", admin_teams_path, class: "btn btn--sm btn--ghost" %>
+    </div>
+
+    <div class="table-wrap">
+      <table class="table">
+        <tbody>
+          <% @recent_teams.each do |team| %>
+            <tr>
+              <td>
+                <%= link_to team.name, admin_team_path(team), class: "table__primary" %>
+                <span class="table__secondary"><%= team.slug %></span>
+              </td>
+              <td class="is-numeric quiet"><%= short_date(team.created_at) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <aside>
+    <section class="panel panel--sunken">
+      <div class="panel__header"><h2>Recent impersonations</h2></div>
+
+      <% if @recent_impersonations.any? %>
+        <ul class="stack--tight stack">
+          <% @recent_impersonations.each do |event| %>
+            <li>
+              <span class="table__primary"><%= event.admin.name %></span>
+              <span class="table__secondary">
+                as <%= event.user.email %> · <%= short_datetime(event.started_at) %>
+                <% if event.active? %><span class="badge badge--critical">Active</span><% end %>
+              </span>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="quiet">None yet.</p>
+      <% end %>
+    </section>
+  </aside>
+</div>

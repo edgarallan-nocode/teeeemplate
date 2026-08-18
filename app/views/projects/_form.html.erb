@@ -1,0 +1,19 @@
+<%= form_with model: project, class: "form" do |f| %>
+  <%= render "shared/form_errors", record: project %>
+
+  <div class="field">
+    <%= f.label :name, class: "field__label" %>
+    <%= f.text_field :name, autofocus: true, class: "input" %>
+  </div>
+
+  <div class="field">
+    <%= f.label :description, class: "field__label" %>
+    <%= f.text_area :description, class: "textarea" %>
+    <p class="field__hint">Optional. Up to 2,000 characters.</p>
+  </div>
+
+  <div class="form-actions">
+    <%= f.submit class: "btn btn--primary" %>
+    <%= link_to "Cancel", projects_path, class: "btn btn--ghost" %>
+  </div>
+<% end %>

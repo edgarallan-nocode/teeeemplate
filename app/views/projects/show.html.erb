@@ -1,0 +1,32 @@
+<% content_for :title, @project.name %>
+
+<%= page_title @project.name do %>
+  <% if policy(@project).update? %>
+    <%= link_to "Edit", edit_project_path(@project), class: "btn" %>
+  <% end %>
+  <% if policy(@project).destroy? %>
+    <%= button_to "Delete", @project, method: :delete, class: "btn btn--danger",
+          form: { data: { turbo_confirm: "Delete #{@project.name}? This cannot be undone." } } %>
+  <% end %>
+<% end %>
+
+<div class="split">
+  <div class="stack">
+    <% if @project.description.present? %>
+      <p class="lede"><%= simple_format @project.description %></p>
+    <% else %>
+      <p class="quiet">No description.</p>
+    <% end %>
+  </div>
+
+  <aside>
+    <dl class="detail-list">
+      <dt>Team</dt>
+      <dd><%= @project.team.name %></dd>
+      <dt>Created by</dt>
+      <dd><%= @project.created_by&.name || "—" %></dd>
+      <dt>Created</dt>
+      <dd><%= short_datetime(@project.created_at) %></dd>
+    </dl>
+  </aside>
+</div>

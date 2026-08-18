@@ -1,0 +1,110 @@
+@use "../abstracts/mixins" as *;
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  color: var(--ink);
+  background-color: var(--paper);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4 {
+  @include display-type;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+h1 { font-size: var(--text-2xl); }
+h2 { font-size: var(--text-xl); }
+h3 { font-size: var(--text-lg); }
+h4 {
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  font-weight: 600;
+  letter-spacing: var(--tracking-normal);
+}
+
+// The page's opening statement. Editorial layouts earn their character here.
+.display {
+  @include display-type;
+  font-size: var(--text-3xl);
+}
+
+p { text-wrap: pretty; }
+
+p + p { margin-top: var(--space-4); }
+
+a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+  transition: color var(--transition);
+
+  &:hover { color: var(--accent); }
+  &:focus-visible { @include focus-ring; }
+}
+
+strong, b { font-weight: 600; }
+
+small { font-size: var(--text-sm); }
+
+code, pre, kbd {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
+
+code {
+  padding: 0.1em 0.35em;
+  background-color: var(--paper-sunken);
+  border: var(--border);
+}
+
+pre {
+  @include scroll-x;
+  padding: var(--space-4);
+  background-color: var(--paper-sunken);
+  border: var(--border);
+
+  code {
+    padding: 0;
+    background: none;
+    border: 0;
+  }
+}
+
+blockquote {
+  padding-left: var(--space-4);
+  border-left: 2px solid var(--rule-strong);
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+}
+
+// --- Utility type roles ----------------------------------------------------
+
+.label { @include label; }
+
+.eyebrow {
+  @include label;
+  display: block;
+  margin-bottom: var(--space-3);
+}
+
+.lede {
+  font-size: var(--text-md);
+  line-height: var(--leading-loose);
+  color: var(--ink-secondary);
+  max-width: var(--measure);
+}
+
+.muted { color: var(--ink-secondary); }
+.quiet { color: var(--ink-tertiary); }
+
+.numeric {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+.visually-hidden { @include visually-hidden; }

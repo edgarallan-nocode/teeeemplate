@@ -1,0 +1,10 @@
+Join <%= @team.name %>
+
+<%= @inviter.name %> has invited you to join <%= @team.name %> as
+<%= Membership::ROLE_LABELS[@invitation.role].downcase %>.
+
+Accept the invitation:
+<%= @accept_url %>
+
+This invitation expires on <%= @invitation.expires_at.to_date.to_fs(:long) %>.
+You will need to sign in as <%= @invitation.email %> to accept it.

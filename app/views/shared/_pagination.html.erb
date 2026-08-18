@@ -1,0 +1,21 @@
+<% if page.many_pages? %>
+  <nav class="pagination" aria-label="Pagination">
+    <span class="pagination__count numeric">
+      <%= page.first_item %>–<%= page.last_item %> of <%= page.total_count %>
+    </span>
+
+    <div class="pagination__links">
+      <% if page.prev_page %>
+        <%= link_to "Previous", url_for(paginate_params(page.prev_page)), class: "btn btn--sm" %>
+      <% else %>
+        <span class="btn btn--sm" aria-disabled="true">Previous</span>
+      <% end %>
+
+      <% if page.next_page %>
+        <%= link_to "Next", url_for(paginate_params(page.next_page)), class: "btn btn--sm" %>
+      <% else %>
+        <span class="btn btn--sm" aria-disabled="true">Next</span>
+      <% end %>
+    </div>
+  </nav>
+<% end %>

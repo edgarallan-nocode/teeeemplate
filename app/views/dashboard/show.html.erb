@@ -1,0 +1,72 @@
+<% content_for :title, current_team.name %>
+
+<%= page_title current_team.name, description: "Everything below is scoped to this team." do %>
+  <% if policy(Project.new(team: current_team)).create? %>
+    <%= link_to "New project", new_project_path, class: "btn btn--primary" %>
+  <% end %>
+<% end %>
+
+<div class="split">
+  <div>
+    <section class="panel">
+      <div class="panel__header">
+        <h2>Recent projects</h2>
+        <%= link_to "All projects", projects_path, class: "btn btn--sm btn--ghost" %>
+      </div>
+
+      <% if @projects.any? %>
+        <div class="table-wrap">
+          <table class="table">
+            <tbody>
+              <% @projects.each do |project| %>
+                <tr>
+                  <td>
+                    <%= link_to project.name, project, class: "table__primary" %>
+                    <span class="table__secondary"><%= project.description.presence || "No description" %></span>
+                  </td>
+                  <td class="is-numeric quiet"><%= short_date(project.created_at) %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <div class="empty">
+          <p class="empty__title">No projects yet</p>
+          <p>Projects are the example tenant-scoped resource. Create one to see scoping at work.</p>
+          <p style="margin-top: var(--space-4);">
+            <%= link_to "Create the first project", new_project_path, class: "btn" %>
+          </p>
+        </div>
+      <% end %>
+    </section>
+  </div>
+
+  <aside class="stack--loose stack">
+    <section class="panel panel--sunken">
+      <div class="panel__header"><h2>Team</h2></div>
+      <div class="stat">
+        <span class="stat__value numeric"><%= current_team.seat_count %></span>
+        <span class="stat__label">Members</span>
+      </div>
+      <% if @pending_invitations.positive? %>
+        <p class="muted" style="margin-top: var(--space-4);">
+          <%= pluralize(@pending_invitations, "invitation") %> pending.
+        </p>
+      <% end %>
+      <p style="margin-top: var(--space-4);">
+        <%= link_to "Manage members", team_members_path(current_team), class: "btn btn--sm" %>
+      </p>
+    </section>
+
+    <% if policy(billing_subject_for(current_team)).show? %>
+      <section class="panel panel--sunken">
+        <div class="panel__header"><h2>Billing</h2></div>
+        <p><%= subscription_badge(current_team.subscription) %></p>
+        <p style="margin-top: var(--space-4);">
+          <%= link_to "Billing settings", billing_subscription_path, class: "btn btn--sm" %>
+        </p>
+      </section>
+    <% end %>
+  </aside>
+</div>

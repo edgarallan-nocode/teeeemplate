@@ -1,0 +1,45 @@
+<% content_for :title, "Teeeemplate — a Rails SaaS starter" %>
+
+<section class="hero">
+  <p class="eyebrow">Rails 8 · PostgreSQL · Hotwire</p>
+  <h1 class="hero__title">A SaaS foundation that reads like a Rails app.</h1>
+  <p class="hero__lede">
+    Authentication, team multi-tenancy, per-seat Stripe billing, background jobs
+    and a platform admin area — assembled once, so the next project starts at
+    the interesting part.
+  </p>
+  <div class="hero__actions button-row">
+    <%= link_to "Create an account", new_user_registration_path, class: "btn btn--lg btn--primary" %>
+    <%= link_to "See pricing", pricing_path, class: "btn btn--lg" %>
+  </div>
+</section>
+
+<section class="section">
+  <div class="feature-list">
+    <article class="feature">
+      <h2 class="feature__title">Teams, not tenants</h2>
+      <p class="feature__body">
+        Users belong to many teams with owner, admin and member roles. Every
+        record belongs to a team, and every query starts from the team rather
+        than from the model.
+      </p>
+    </article>
+
+    <article class="feature">
+      <h2 class="feature__title">Billing that survives a redirect</h2>
+      <p class="feature__body">
+        Per-seat Stripe subscriptions driven by signed, idempotent webhooks.
+        A successful browser redirect is never mistaken for a successful payment.
+      </p>
+    </article>
+
+    <article class="feature">
+      <h2 class="feature__title">No build to fight</h2>
+      <p class="feature__body">
+        Server-rendered views, Turbo for navigation, a handful of Stimulus
+        controllers, and SASS. esbuild is there when a real npm package earns
+        its place.
+      </p>
+    </article>
+  </div>
+</section>

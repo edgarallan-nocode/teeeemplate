@@ -1,0 +1,98 @@
+# RuboCop configuration. This file is the source of truth — editor plugins only
+# mirror it, and CI runs exactly what is written here.
+#
+# The base is rubocop-rails-omakase, the Rails team's own style. It is
+# deliberately relaxed: it enforces layout and obvious mistakes and stays out of
+# arguments about style. Every deviation below is listed with its reason.
+
+inherit_gem:
+  rubocop-rails-omakase: rubocop.yml
+
+plugins:
+  - rubocop-rspec
+
+AllCops:
+  TargetRubyVersion: 3.4
+  NewCops: enable
+  Exclude:
+    - "bin/**/*"
+    - "db/schema.rb"
+    - "db/migrate/*_create_active_storage_tables.active_storage.rb"
+    - "node_modules/**/*"
+    - "vendor/**/*"
+    - "tmp/**/*"
+    - "storage/**/*"
+    - "coverage/**/*"
+
+# --- Deviations from omakase ------------------------------------------------
+
+# Every file in this project is frozen-string-literal. Omakase leaves this off;
+# we want it on so string allocation in hot paths is not accidental.
+Style/FrozenStringLiteralComment:
+  Enabled: true
+  EnforcedStyle: always
+
+# A method that has grown past this is usually doing two things. Services exist
+# precisely so controllers do not.
+Metrics/MethodLength:
+  Enabled: true
+  Max: 25
+  Exclude:
+    - "db/migrate/**/*"      # a migration is one long declaration
+    - "spec/**/*"            # a spec example reads as prose
+
+Metrics/AbcSize:
+  Enabled: true
+  Max: 25
+  Exclude:
+    - "db/migrate/**/*"
+    - "spec/**/*"
+
+Metrics/ClassLength:
+  Enabled: true
+  Max: 180
+  Exclude:
+    - "spec/**/*"
+
+# --- RSpec ------------------------------------------------------------------
+
+# Multiple expectations in one example are fine when they describe one
+# behaviour — splitting them would repeat the setup and obscure the point.
+RSpec/MultipleExpectations:
+  Enabled: false
+
+RSpec/ExampleLength:
+  Enabled: false
+
+RSpec/NestedGroups:
+  Max: 4
+
+# Test names in this project are sentences, and some of them are long because
+# the behaviour they describe is subtle.
+RSpec/ExampleWording:
+  Enabled: false
+
+# `let!` is the honest way to express "this record must exist before the
+# example runs", which is most of the tenant-isolation setup.
+RSpec/LetSetup:
+  Enabled: false
+
+# Spec files describe features, not always a single class.
+RSpec/SpecFilePathFormat:
+  Enabled: false
+
+RSpec/DescribeClass:
+  Enabled: false
+
+RSpec/MultipleMemoizedHelpers:
+  Max: 8
+
+# Stubbing Stripe's SDK is the point of the billing specs.
+RSpec/MessageSpies:
+  Enabled: false
+
+RSpec/StubbedMock:
+  Enabled: false
+
+RSpec/VerifiedDoubles:
+  Enabled: true

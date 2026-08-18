@@ -1,0 +1,124 @@
+// ---------------------------------------------------------------------------
+// Design tokens
+//
+// Editorial, typography-led, high contrast. The rules that keep it coherent:
+//   * no border radius
+//   * no gradients
+//   * no shadows used as decoration
+//   * borders are hairlines, and they do the work a shadow would elsewhere
+//   * one accent colour, used sparingly
+// ---------------------------------------------------------------------------
+
+:root {
+  // --- Colour ------------------------------------------------------------
+  // Ink on paper. Near-black rather than pure black, off-white rather than
+  // pure white — easier on the eye at length, and it reads as printed.
+  --ink:            #111111;
+  --ink-secondary:  #5a5a58;
+  --ink-tertiary:   #8a8a86;
+  --paper:          #fdfdfb;
+  --paper-sunken:   #f4f4f0;
+  --paper-raised:   #ffffff;
+
+  --rule:           #e0e0da;   // hairline borders
+  --rule-strong:    #111111;   // structural borders
+
+  --accent:         #8c3b1e;   // a single muted brick red
+  --accent-ink:     #ffffff;
+  --accent-wash:    #f7ede9;
+
+  --positive:       #2f5d3a;
+  --positive-wash:  #edf3ee;
+  --caution:        #7a5a12;
+  --caution-wash:   #f8f2e2;
+  --critical:       #8f2a2a;
+  --critical-wash:  #f8eaea;
+
+  // --- Type ----------------------------------------------------------------
+  // System stacks only. No webfont request, nothing external to load, and no
+  // flash of unstyled text.
+  --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua",
+                  Georgia, "Times New Roman", serif;
+  --font-body:    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                  "Helvetica Neue", Arial, sans-serif;
+  --font-mono:    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+                  "Liberation Mono", monospace;
+
+  // Fluid modular scale. clamp() means one definition covers every viewport.
+  --text-xs:   0.75rem;
+  --text-sm:   0.8125rem;
+  --text-base: 0.9375rem;
+  --text-md:   1.0625rem;
+  --text-lg:   clamp(1.25rem, 0.5vw + 1.1rem, 1.5rem);
+  --text-xl:   clamp(1.625rem, 1.2vw + 1.3rem, 2.125rem);
+  --text-2xl:  clamp(2.125rem, 2.4vw + 1.5rem, 3.25rem);
+  --text-3xl:  clamp(2.75rem, 4vw + 1.6rem, 4.5rem);
+
+  --leading-tight: 1.15;
+  --leading-snug:  1.35;
+  --leading-body:  1.6;
+  --leading-loose: 1.75;
+
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide:  0.08em;
+  --tracking-caps:  0.14em;
+
+  // --- Space ---------------------------------------------------------------
+  // A 4px base, named rather than numbered past the small end so the intent
+  // survives being read out of context.
+  --space-1:  0.25rem;
+  --space-2:  0.5rem;
+  --space-3:  0.75rem;
+  --space-4:  1rem;
+  --space-5:  1.5rem;
+  --space-6:  2rem;
+  --space-7:  3rem;
+  --space-8:  4rem;
+  --space-9:  6rem;
+  --space-10: 8rem;
+
+  // --- Layout --------------------------------------------------------------
+  --measure:       68ch;    // comfortable reading width
+  --width-narrow:  38rem;
+  --width-text:    46rem;
+  --width-content: 64rem;
+  --width-wide:    84rem;
+
+  --gutter: var(--space-5);
+
+  // --- Lines ---------------------------------------------------------------
+  --border:        1px solid var(--rule);
+  --border-strong: 1px solid var(--rule-strong);
+  --radius:        0;
+
+  // --- Motion --------------------------------------------------------------
+  --transition: 120ms ease-out;
+}
+
+// Dark mode inverts ink and paper rather than restyling every component. The
+// tokens carry the whole change.
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink:           #f2f1ec;
+    --ink-secondary: #a8a69e;
+    --ink-tertiary:  #77756e;
+    --paper:         #131311;
+    --paper-sunken:  #1b1b18;
+    --paper-raised:  #1e1e1b;
+
+    --rule:          #33322e;
+    --rule-strong:   #f2f1ec;
+
+    --accent:        #d97a55;
+    --accent-ink:    #131311;
+    --accent-wash:   #2a1d17;
+
+    --positive:      #8fc09c;
+    --positive-wash: #1a241c;
+    --caution:       #d9bd7a;
+    --caution-wash:  #262015;
+    --critical:      #e08c8c;
+    --critical-wash: #291a1a;
+  }
+}

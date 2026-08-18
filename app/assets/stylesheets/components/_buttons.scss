@@ -1,0 +1,111 @@
+@use "../abstracts/mixins" as *;
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: 0.55rem var(--space-4);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius);
+  background-color: transparent;
+  color: var(--ink);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color var(--transition), color var(--transition),
+              border-color var(--transition);
+
+  &:hover {
+    background-color: var(--ink);
+    color: var(--paper);
+  }
+
+  &:focus-visible { @include focus-ring; }
+
+  &:disabled,
+  &[aria-disabled="true"] {
+    opacity: 0.45;
+    cursor: not-allowed;
+    background-color: transparent;
+    color: var(--ink);
+  }
+}
+
+// The single most important action on a page. There should be one.
+.btn--primary {
+  background-color: var(--ink);
+  color: var(--paper);
+
+  &:hover {
+    background-color: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-ink);
+  }
+}
+
+// Secondary actions: no border until hovered, so a row of them stays quiet.
+.btn--ghost {
+  border-color: transparent;
+  color: var(--ink-secondary);
+
+  &:hover {
+    background-color: transparent;
+    color: var(--ink);
+    border-color: var(--rule);
+  }
+}
+
+.btn--danger {
+  border-color: var(--critical);
+  color: var(--critical);
+
+  &:hover {
+    background-color: var(--critical);
+    border-color: var(--critical);
+    color: var(--paper);
+  }
+}
+
+.btn--sm {
+  padding: 0.3rem var(--space-3);
+  font-size: var(--text-xs);
+}
+
+.btn--lg {
+  padding: 0.75rem var(--space-5);
+  font-size: var(--text-base);
+}
+
+.btn--block {
+  display: flex;
+  width: 100%;
+}
+
+// A button that reads as a link — for destructive actions inside table rows,
+// where a real button would shout.
+.btn-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink-secondary);
+  font-size: var(--text-sm);
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  cursor: pointer;
+
+  &:hover { color: var(--accent); }
+  &:focus-visible { @include focus-ring; }
+}
+
+.btn-link--danger:hover { color: var(--critical); }
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+}

@@ -1,0 +1,55 @@
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  tab-size: 4;
+}
+
+body,
+h1, h2, h3, h4, h5, h6,
+p, figure, blockquote, dl, dd,
+ul, ol { margin: 0; }
+
+ul[class], ol[class] {
+  padding: 0;
+  list-style: none;
+}
+
+img, picture, svg, video {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+input, button, textarea, select {
+  font: inherit;
+  color: inherit;
+}
+
+button { background: none; }
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+hr {
+  height: 0;
+  border: 0;
+  border-top: var(--border);
+}
+
+[hidden] { display: none !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

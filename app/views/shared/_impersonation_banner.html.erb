@@ -1,0 +1,15 @@
+<% if Current.impersonating? %>
+  <%# Deliberately loud and always visible. It must be impossible to forget %>
+  <%# that you are acting as someone else. %>
+  <div class="impersonation-banner" role="alert">
+    <div class="container impersonation-banner__inner">
+      <span>
+        <strong>Impersonating <%= Current.user.name %></strong>
+        (<%= Current.user.email %>) as <%= Current.true_user.name %>.
+        Billing and destructive actions are blocked.
+      </span>
+      <%= button_to "Stop impersonating", admin_stop_impersonation_path,
+            method: :delete, class: "btn btn--sm" %>
+    </div>
+  </div>
+<% end %>

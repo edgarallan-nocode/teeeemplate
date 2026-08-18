@@ -1,0 +1,5 @@
+// Email cannot use the stylesheet — mail clients need inline styles, and the
+// mailer layout carries its own. This file exists so the letter_opener preview
+// in development is not completely unstyled, and to document where email
+// styling actually lives: app/views/layouts/mailer.html.erb.
+.mailer-preview { max-width: 40rem; margin-inline: auto; }

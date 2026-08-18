@@ -1,0 +1,152 @@
+@use "../abstracts/mixins" as *;
+
+.form { max-width: var(--width-narrow); }
+.form--wide { max-width: none; }
+
+.field + .field { margin-top: var(--space-4); }
+
+.field__label {
+  display: block;
+  margin-bottom: var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.field__hint {
+  margin-top: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--ink-tertiary);
+}
+
+.field__error {
+  margin-top: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--critical);
+}
+
+.input,
+.select,
+.textarea {
+  display: block;
+  width: 100%;
+  padding: 0.55rem var(--space-3);
+  background-color: var(--paper-raised);
+  border: var(--border);
+  border-radius: var(--radius);
+  color: var(--ink);
+  font-size: var(--text-base);
+  transition: border-color var(--transition);
+
+  &::placeholder { color: var(--ink-tertiary); }
+
+  &:hover { border-color: var(--ink-tertiary); }
+
+  &:focus {
+    outline: none;
+    border-color: var(--ink);
+    box-shadow: inset 0 0 0 1px var(--ink);
+  }
+
+  &:disabled {
+    background-color: var(--paper-sunken);
+    color: var(--ink-tertiary);
+    cursor: not-allowed;
+  }
+
+  &[aria-invalid="true"] { border-color: var(--critical); }
+}
+
+.textarea {
+  min-height: 8rem;
+  line-height: var(--leading-body);
+  resize: vertical;
+}
+
+.select {
+  appearance: none;
+  padding-right: var(--space-6);
+  // Chevron drawn inline so there is no image request and it inherits colour.
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+                    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: calc(100% - 1.05rem) 55%, calc(100% - 0.75rem) 55%;
+  background-size: 0.3rem 0.3rem, 0.3rem 0.3rem;
+  background-repeat: no-repeat;
+}
+
+// Checkbox and radio rows.
+.choice {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  cursor: pointer;
+}
+
+.choice + .choice { margin-top: var(--space-3); }
+
+.choice__control {
+  flex: none;
+  width: 1rem;
+  height: 1rem;
+  margin-top: 0.22rem;
+  accent-color: var(--ink);
+}
+
+.choice__text { font-size: var(--text-sm); }
+.choice__hint {
+  display: block;
+  color: var(--ink-tertiary);
+  font-size: var(--text-xs);
+}
+
+// Search / filter bar above a table.
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+  margin-bottom: var(--space-5);
+
+  .input, .select { width: auto; min-width: 14rem; }
+}
+
+// Inline form: an input and its button on one line.
+.inline-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: flex-start;
+
+  .input, .select { flex: 1 1 12rem; width: auto; }
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+  margin-top: var(--space-6);
+  padding-top: var(--space-5);
+  border-top: var(--border);
+}
+
+// Rails' error wrapper.
+.field_with_errors {
+  display: contents;
+
+  .input, .select, .textarea { border-color: var(--critical); }
+}
+
+.form-errors {
+  padding: var(--space-4);
+  margin-bottom: var(--space-5);
+  border: 1px solid var(--critical);
+  background-color: var(--critical-wash);
+  color: var(--critical);
+
+  &__title {
+    font-weight: 600;
+    margin-bottom: var(--space-2);
+  }
+
+  ul { padding-left: var(--space-4); list-style: disc; }
+}

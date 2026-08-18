@@ -1,0 +1,12 @@
+<div class="page-header">
+  <div class="page-header__text">
+    <h1><%= title %></h1>
+    <% if description.present? %>
+      <p class="page-header__description"><%= description %></p>
+    <% end %>
+  </div>
+
+  <% if actions %>
+    <div class="button-row"><%= capture(&actions) %></div>
+  <% end %>
+</div>

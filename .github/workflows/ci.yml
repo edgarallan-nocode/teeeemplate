@@ -1,0 +1,128 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# A newer push to the same branch makes the running job pointless.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: RuboCop
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version-file: .ruby-version
+          bundler-cache: true
+      - run: bundle exec rubocop --parallel
+
+  security:
+    name: Security
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version-file: .ruby-version
+          bundler-cache: true
+
+      - name: Brakeman
+        run: bundle exec brakeman --quiet --no-pager
+
+      # --update so a newly published advisory fails the build on the next run,
+      # not whenever the checked-in database happens to be refreshed.
+      - name: bundler-audit
+        run: bundle exec bundle-audit check --update
+
+  assets:
+    name: Assets build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - name: Build JavaScript
+        run: npm run build
+      - name: Build CSS
+        run: npm run build:css
+
+  test:
+    name: RSpec
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      RAILS_ENV: test
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/teeeemplate_test
+      REDIS_URL: redis://localhost:6379/0
+      # Deliberately no RAILS_MASTER_KEY. Specs never reach Stripe — WebMock
+      # blocks outbound HTTP and the billing specs stub credentials — so the
+      # suite passes on a fresh clone with no secrets configured. If you add a
+      # spec that genuinely needs a decrypted credential, add the key as a
+      # repository secret then, not before.
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version-file: .ruby-version
+          bundler-cache: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+
+      - name: Install JavaScript dependencies
+        run: npm ci
+
+      # System specs render real pages, which need the compiled bundles.
+      - name: Build assets
+        run: |
+          npm run build
+          npm run build:css
+
+      - name: Prepare the database
+        run: bin/rails db:test:prepare
+
+      - name: RSpec
+        run: bundle exec rspec
+
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage/
+          retention-days: 7

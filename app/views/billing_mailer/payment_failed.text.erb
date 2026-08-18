@@ -1,0 +1,10 @@
+A payment failed
+
+Stripe could not charge the card on file for <%= @team.name %>.
+
+Your team still has access for now, but repeated failures will end the
+subscription. Update the card here:
+
+<%= billing_subscription_url %>
+
+You are receiving this because you are an owner of <%= @team.name %>.

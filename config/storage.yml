@@ -1,0 +1,15 @@
+test:
+  service: Disk
+  root: <%= Rails.root.join("tmp/storage") %>
+
+local:
+  service: Disk
+  root: <%= Rails.root.join("storage") %>
+
+# Production S3. Note what is NOT here: access_key_id and secret_access_key.
+# The AWS SDK resolves credentials from the EC2 instance IAM role, so no
+# long-lived keys exist in the repo, in credentials, or in the environment.
+amazon:
+  service: S3
+  region: <%= ENV.fetch("AWS_REGION", "us-east-1") %>
+  bucket: <%= ENV["S3_BUCKET"] %>

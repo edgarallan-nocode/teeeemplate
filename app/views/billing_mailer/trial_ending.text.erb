@@ -1,0 +1,8 @@
+Your trial ends soon
+
+The trial for <%= @team.name %> ends on <%= @ends_at&.to_date&.to_fs(:long) %>.
+
+You will then be billed for <%= pluralize(@team.seat_count, "seat") %> at your
+plan's rate. No action is needed if that is what you want.
+
+<%= billing_subscription_url %>

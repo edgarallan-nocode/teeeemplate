@@ -1,0 +1,53 @@
+<header class="masthead" data-controller="toggle">
+  <div class="container masthead__inner">
+    <%= link_to "Teeeemplate", user_signed_in? ? dashboard_path : root_path, class: "masthead__brand" %>
+
+    <% if Current.user %>
+      <nav class="masthead__nav" aria-label="Main">
+        <%= link_to "Dashboard", dashboard_path, class: "nav-link",
+              "aria-current": current_page?(dashboard_path) ? "page" : nil %>
+        <%= link_to "Projects", projects_path, class: "nav-link",
+              "aria-current": controller_name == "projects" ? "page" : nil %>
+        <% if current_team %>
+          <%= link_to "Members", team_members_path(current_team), class: "nav-link",
+                "aria-current": controller_name == "members" ? "page" : nil %>
+        <% end %>
+      </nav>
+
+      <div class="masthead__actions">
+        <%= render "shared/team_switcher" if current_team %>
+        <%= render "shared/user_menu" %>
+
+        <button type="button" class="btn btn--sm btn--ghost masthead__menu-button"
+                data-toggle-target="trigger"
+                data-action="toggle#toggle"
+                aria-expanded="false"
+                aria-label="Toggle navigation">Menu</button>
+      </div>
+    <% else %>
+      <nav class="masthead__nav" aria-label="Main">
+        <%= link_to "Pricing", pricing_path, class: "nav-link" %>
+      </nav>
+
+      <div class="masthead__actions">
+        <%= link_to "Sign in", new_user_session_path, class: "btn btn--sm btn--ghost" %>
+        <%= link_to "Get started", new_user_registration_path, class: "btn btn--sm btn--primary" %>
+      </div>
+    <% end %>
+  </div>
+
+  <% if Current.user %>
+    <div class="container">
+      <nav class="mobile-nav" data-toggle-target="content" hidden aria-label="Mobile">
+        <%= link_to "Dashboard", dashboard_path, class: "nav-link" %>
+        <%= link_to "Projects", projects_path, class: "nav-link" %>
+        <% if current_team %>
+          <%= link_to "Members", team_members_path(current_team), class: "nav-link" %>
+          <%= link_to "Team settings", edit_team_path(current_team), class: "nav-link" %>
+          <%= link_to "Billing", billing_subscription_path, class: "nav-link" %>
+        <% end %>
+        <%= link_to "Account", account_path, class: "nav-link" %>
+      </nav>
+    </div>
+  <% end %>
+</header>

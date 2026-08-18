@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+# Prepare a fresh development environment.
+#
+# Safe to run repeatedly — every step is idempotent.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+say() { printf "\n\033[1m==> %s\033[0m\n" "$1"; }
+fail() { printf "\n\033[31mx %s\033[0m\n" "$1" >&2; exit 1; }
+
+say "Checking prerequisites"
+
+expected_ruby="$(cat .ruby-version)"
+actual_ruby="$(ruby -e 'print RUBY_VERSION')"
+[ "$expected_ruby" = "$actual_ruby" ] || fail \
+  "Ruby $expected_ruby is required, found $actual_ruby. Try: rbenv install $expected_ruby"
+
+command -v node >/dev/null || fail "Node is not installed. See .node-version for the expected version."
+command -v npm  >/dev/null || fail "npm is not installed."
+pg_isready -q || fail "PostgreSQL is not accepting connections. Start it and try again."
+
+if ! (redis-cli ping >/dev/null 2>&1); then
+  printf "  warning: Redis is not responding. Sidekiq and the cache need it.\n"
+fi
+echo "  ruby $actual_ruby, node $(node -v), postgres ok"
+
+say "Installing Ruby dependencies"
+gem install bundler --conservative >/dev/null
+bundle check >/dev/null 2>&1 || bundle install
+
+say "Installing JavaScript dependencies"
+if [ -f package-lock.json ]; then npm ci; else npm install; fi
+
+say "Preparing credentials"
+bin/rails credentials:bootstrap_development
+
+if [ ! -f .env ]; then
+  cp .env.example .env
+  echo "  created .env from .env.example"
+else
+  echo "  .env already exists, leaving it alone"
+fi
+
+say "Preparing the database"
+bin/rails db:prepare
+
+say "Seeding development data"
+bin/rails db:seed
+
+say "Building assets"
+npm run build
+npm run build:css
+
+say "Ready"
+cat <<'EOF'
+
+  Start the app:      bin/dev
+  Run the tests:      bin/test
+  Lint and scan:      bin/lint
+  Everything CI runs: bin/ci
+
+  Then open http://localhost:3000 and sign in with any seeded account
+  (see the list printed above; the password is the same for all of them).
+
+EOF

@@ -1,0 +1,33 @@
+<div class="dropdown" data-controller="dropdown">
+  <button type="button" class="team-switch"
+          data-dropdown-target="button"
+          data-action="dropdown#toggle"
+          aria-haspopup="true"
+          aria-expanded="false">
+    <span class="team-switch__name"><%= current_team.name %></span>
+    <span class="team-switch__caret" aria-hidden="true">▼</span>
+  </button>
+
+  <div class="dropdown__menu dropdown__menu--left" data-dropdown-target="menu" hidden>
+    <span class="dropdown__label">Your teams</span>
+
+    <% available_teams.each do |team| %>
+      <% if team == current_team %>
+        <span class="dropdown__item" aria-current="true"><%= team.name %></span>
+      <% else %>
+        <%= button_to team.name, team_switch_path(team),
+              class: "dropdown__item", form: { data: { turbo: false } } %>
+      <% end %>
+    <% end %>
+
+    <hr class="dropdown__divider">
+
+    <% if policy(current_team).update? %>
+      <%= link_to "Team settings", edit_team_path(current_team), class: "dropdown__item" %>
+    <% end %>
+    <% if policy(billing_subject_for(current_team)).show? %>
+      <%= link_to "Billing", billing_subscription_path, class: "dropdown__item" %>
+    <% end %>
+    <%= link_to "New team", new_team_path, class: "dropdown__item" %>
+  </div>
+</div>

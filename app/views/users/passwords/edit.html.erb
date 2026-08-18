@@ -1,0 +1,27 @@
+<% content_for :title, "Choose a new password" %>
+
+<div class="auth">
+  <div class="auth__panel">
+    <h1 class="auth__title">Choose a new password</h1>
+
+    <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :put, class: "form" }) do |f| %>
+      <%= render "shared/form_errors", record: resource %>
+      <%= f.hidden_field :reset_password_token %>
+
+      <div class="field">
+        <%= f.label :password, "New password", class: "field__label" %>
+        <%= f.password_field :password, autofocus: true, autocomplete: "new-password", class: "input" %>
+        <p class="field__hint">At least <%= @minimum_password_length %> characters.</p>
+      </div>
+
+      <div class="field">
+        <%= f.label :password_confirmation, "Confirm new password", class: "field__label" %>
+        <%= f.password_field :password_confirmation, autocomplete: "new-password", class: "input" %>
+      </div>
+
+      <div class="form-actions">
+        <%= f.submit "Change password", class: "btn btn--primary btn--block" %>
+      </div>
+    <% end %>
+  </div>
+</div>

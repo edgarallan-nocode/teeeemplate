@@ -1,0 +1,12 @@
+<h1 style="margin:0 0 16px; font-family:Georgia,serif; font-size:22px; font-weight:normal; color:#111111;">
+  You're in
+</h1>
+
+<p style="margin:0 0 16px;">Hello <%= @user.name %>,</p>
+
+<p style="margin:0 0 16px;">
+  You have been added to <strong><%= @team.name %></strong> as
+  <%= @membership.role_label.downcase %>.
+</p>
+
+<%= render "shared/email_button", url: dashboard_url, label: "Open #{@team.name}" %>

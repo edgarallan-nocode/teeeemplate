@@ -1,0 +1,18 @@
+<h1 style="margin:0 0 16px; font-family:Georgia,serif; font-size:22px; font-weight:normal; color:#111111;">
+  Your email address was changed
+</h1>
+
+<p style="margin:0 0 16px;">Hello <%= @resource.name %>,</p>
+
+<p style="margin:0 0 16px;">
+  <% if @resource.try(:unconfirmed_email?) %>
+    Your address is being changed to <strong><%= @resource.unconfirmed_email %></strong>.
+    Confirm it from the email we sent there.
+  <% else %>
+    Your address has been changed to <strong><%= @resource.email %></strong>.
+  <% end %>
+</p>
+
+<p style="margin:0; font-size:13px; color:#5a5a58;">
+  If this was not you, contact <%= Rails.configuration.x.support_email %>.
+</p>

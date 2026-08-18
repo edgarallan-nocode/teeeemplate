@@ -1,0 +1,56 @@
+@use "../abstracts/mixins" as *;
+
+// Modals are rendered into a Turbo Frame and driven by the `modal` Stimulus
+// controller. A <dialog> would be simpler, but Turbo Frame navigation needs the
+// element to exist before the response arrives.
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: var(--space-5);
+  overflow-y: auto;
+  background-color: rgb(0 0 0 / 45%);
+}
+
+.modal[hidden] { display: none; }
+
+.modal__panel {
+  width: 100%;
+  max-width: var(--width-narrow);
+  margin-block: auto;
+  padding: var(--space-6);
+  background-color: var(--paper);
+  border: var(--border-strong);
+}
+
+.modal__header {
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-start;
+  justify-content: space-between;
+  padding-bottom: var(--space-4);
+  margin-bottom: var(--space-5);
+  border-bottom: var(--border);
+}
+
+.modal__title {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+}
+
+.modal__close {
+  flex: none;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink-tertiary);
+  font-size: var(--text-lg);
+  line-height: 1;
+  cursor: pointer;
+
+  &:hover { color: var(--ink); }
+  &:focus-visible { @include focus-ring; }
+}

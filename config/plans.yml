@@ -1,0 +1,29 @@
+# Subscription plans. Billing is per-seat: Stripe quantity always equals the
+# team's active membership count, so each price below is a *per-user* price.
+#
+# `price_id` names a key under credentials `stripe.prices`, so test and live
+# price ids can differ per environment without editing this file.
+#
+# The plan list is public — it drives the pricing page — which is exactly why
+# the price ids themselves live in credentials rather than here.
+plans:
+  - key: starter
+    name: Starter
+    price_id: starter_monthly
+    unit_amount: 1200          # cents per seat per month, for display only
+    interval: month
+    default: true
+    features:
+      - Unlimited projects
+      - Up to 10 team members
+      - Email support
+  - key: pro
+    name: Pro
+    price_id: pro_monthly
+    unit_amount: 2400
+    interval: month
+    features:
+      - Everything in Starter
+      - Unlimited team members
+      - Priority support
+      - Audit log

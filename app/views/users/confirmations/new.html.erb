@@ -1,0 +1,25 @@
+<% content_for :title, "Resend confirmation" %>
+
+<div class="auth">
+  <div class="auth__panel">
+    <h1 class="auth__title">Resend confirmation</h1>
+    <p class="auth__subtitle">
+      Enter your email and we will send the confirmation link again.
+    </p>
+
+    <%= form_for(resource, as: resource_name, url: confirmation_path(resource_name), html: { method: :post, class: "form" }) do |f| %>
+      <div class="field">
+        <%= f.label :email, class: "field__label" %>
+        <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "input" %>
+      </div>
+
+      <div class="form-actions">
+        <%= f.submit "Resend confirmation", class: "btn btn--primary btn--block" %>
+      </div>
+    <% end %>
+
+    <div class="auth__footer">
+      <%= link_to "Back to sign in", new_session_path(resource_name) %>
+    </div>
+  </div>
+</div>

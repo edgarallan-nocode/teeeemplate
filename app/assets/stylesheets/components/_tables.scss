@@ -1,0 +1,89 @@
+@use "../abstracts/mixins" as *;
+@use "../abstracts/breakpoints" as *;
+
+.table-wrap { @include scroll-x; }
+
+.table {
+  width: 100%;
+  font-size: var(--text-sm);
+  text-align: left;
+
+  th, td {
+    padding: var(--space-3) var(--space-4);
+    vertical-align: middle;
+  }
+
+  th:first-child, td:first-child { padding-left: 0; }
+  th:last-child,  td:last-child  { padding-right: 0; }
+
+  thead th {
+    @include label;
+    padding-top: 0;
+    padding-bottom: var(--space-2);
+    border-bottom: var(--border-strong);
+    white-space: nowrap;
+  }
+
+  tbody tr { border-bottom: var(--border); }
+
+  tbody tr:hover { background-color: var(--paper-sunken); }
+
+  // Numbers line up when they are tabular and right-aligned.
+  .is-numeric {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .is-actions {
+    text-align: right;
+    white-space: nowrap;
+  }
+}
+
+.table__primary {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.table__secondary {
+  display: block;
+  font-size: var(--text-xs);
+  color: var(--ink-tertiary);
+}
+
+// Definition-style rows for a single record's attributes.
+.detail-list {
+  display: grid;
+  gap: 0;
+
+  @include sm { grid-template-columns: 12rem minmax(0, 1fr); }
+
+  dt {
+    @include label;
+    padding: var(--space-3) 0;
+    border-top: var(--border);
+  }
+
+  dd {
+    padding: var(--space-3) 0;
+    margin: 0;
+
+    @include sm { border-top: var(--border); }
+  }
+}
+
+// Pagination.
+.pagination {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
+  border-top: var(--border);
+  font-size: var(--text-sm);
+}
+
+.pagination__count { color: var(--ink-tertiary); }
+.pagination__links { display: flex; gap: var(--space-2); }

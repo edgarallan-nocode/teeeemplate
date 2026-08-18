@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Run the application: web server, JS watcher, CSS watcher, and Sidekiq.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+if ! (redis-cli ping >/dev/null 2>&1); then
+  echo "Redis is not running. Sidekiq will keep retrying its connection." >&2
+fi
+
+exec foreman start -f Procfile.dev "$@"

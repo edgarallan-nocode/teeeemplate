@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Run the test suite. Any arguments are passed through to RSpec, so
+# `bin/test spec/policies` and `bin/test spec/foo_spec.rb:42` both work.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+exec bundle exec rspec "$@"
