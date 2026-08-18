@@ -43,7 +43,7 @@ Development mail is captured at <http://localhost:3000/dev/letter_opener>.
 | Command | Does |
 |---|---|
 | `bin/setup` | Prepare a development environment. Safe to re-run |
-| `bin/dev` | Web server, JS watcher, CSS watcher, Sidekiq |
+| `bin/dev` | Web server, JS watcher, CSS watcher, Sidekiq. `PORT=3001 bin/dev` to move ports |
 | `bin/test` | RSpec. Arguments pass through: `bin/test spec/policies` |
 | `bin/lint` | RuboCop, Brakeman, bundler-audit. `--fix` to autocorrect |
 | `bin/ci` | Everything CI runs, in the same order |

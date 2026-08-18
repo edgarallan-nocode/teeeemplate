@@ -1,10 +1,45 @@
 #!/usr/bin/env bash
 # Run the application: web server, JS watcher, CSS watcher, and Sidekiq.
+#
+# foreman kills every process when any one of them exits, so a web server that
+# cannot start takes the whole stack down with it. The checks below catch the
+# two common causes first and say what to do about them, rather than letting
+# four processes start and immediately die.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
+PORT="${PORT:-3000}"
+PIDFILE="tmp/pids/server.pid"
+
+note() { printf "\033[33m%s\033[0m\n" "$1" >&2; }
+fail() { printf "\033[31m%s\033[0m\n" "$1" >&2; exit 1; }
+
+# A pid file left behind by a crashed or force-killed server. Rails refuses to
+# boot while it exists, even though nothing is running.
+if [ -f "$PIDFILE" ]; then
+  stale_pid="$(cat "$PIDFILE")"
+  if kill -0 "$stale_pid" 2>/dev/null; then
+    fail "A server is already running (pid ${stale_pid}).
+
+  Stop it first, or:  kill ${stale_pid}"
+  fi
+
+  note "Removing a stale ${PIDFILE} left by pid ${stale_pid} (not running)."
+  rm -f "$PIDFILE"
+fi
+
+# Something else — another project, a stray process — is holding the port.
+listener="$(lsof -nP -iTCP:"$PORT" -sTCP:LISTEN -t 2>/dev/null | head -1 || true)"
+if [ -n "$listener" ]; then
+  fail "Port ${PORT} is already in use by pid ${listener}:
+
+  $(ps -p "$listener" -o command= 2>/dev/null | cut -c1-100)
+
+  Stop it, or run on another port:  PORT=3001 bin/dev"
+fi
+
 if ! (redis-cli ping >/dev/null 2>&1); then
-  echo "Redis is not running. Sidekiq will keep retrying its connection." >&2
+  note "Redis is not responding. Sidekiq will keep retrying, and background jobs will not run."
 fi
 
 exec foreman start -f Procfile.dev "$@"
