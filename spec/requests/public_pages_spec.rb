@@ -22,7 +22,7 @@ RSpec.describe "Public pages" do
     get pricing_path
 
     expect(response).to have_http_status(:ok)
-    Plan.all.each { |plan| expect(response.body).to include(plan.name) }
+    Plan.all.each { |plan| expect(response.body).to include(html(plan.name)) }
   end
 
   it "renders the legal stubs" do

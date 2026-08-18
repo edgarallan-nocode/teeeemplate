@@ -29,7 +29,7 @@ RSpec.describe "Impersonation" do
       start_impersonating
       get dashboard_path
 
-      expect(response.body).to include(tenant.team.name)
+      expect(response.body).to include(html(tenant.team.name))
     end
 
     it "shows a banner naming both people" do
@@ -37,8 +37,8 @@ RSpec.describe "Impersonation" do
       get dashboard_path
 
       expect(response.body).to include("Impersonating")
-      expect(response.body).to include(target.name)
-      expect(response.body).to include(platform_admin.name)
+      expect(response.body).to include(html(target.name))
+      expect(response.body).to include(html(platform_admin.name))
     end
 
     it "refuses to impersonate another platform admin" do

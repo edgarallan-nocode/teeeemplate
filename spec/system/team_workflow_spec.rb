@@ -40,20 +40,22 @@ RSpec.describe "Team workflow" do
     beta  = create(:team, name: "Beta Team")
     create(:membership, :owner, user: user, team: alpha)
     create(:membership, :owner, user: user, team: beta)
-    create(:project, team: alpha, name: "Alpha only")
-    create(:project, team: beta,  name: "Beta only")
+    only_in_alpha = create(:user, email: "only-in-alpha@example.com")
+    only_in_beta  = create(:user, email: "only-in-beta@example.com")
+    create(:membership, user: only_in_alpha, team: alpha)
+    create(:membership, user: only_in_beta,  team: beta)
 
     sign_in_through_form(user)
-    visit projects_path
 
-    expect(page).to have_content("Alpha only").or have_content("Beta only")
+    visit team_members_path(alpha)
+    expect(page).to have_content("only-in-alpha@example.com")
+    expect(page).to have_no_content("only-in-beta@example.com")
 
-    # Switch explicitly rather than through the dropdown, which needs JS.
-    page.driver.post(team_switch_path(beta))
-    visit projects_path
-
-    expect(page).to have_content("Beta only")
-    expect(page).to have_no_content("Alpha only")
+    # Visiting another team's page switches the active team, so the roster and
+    # the policies that guard it move together.
+    visit team_members_path(beta)
+    expect(page).to have_content("only-in-beta@example.com")
+    expect(page).to have_no_content("only-in-alpha@example.com")
   end
 
   it "invites someone, and they accept and land in the team" do

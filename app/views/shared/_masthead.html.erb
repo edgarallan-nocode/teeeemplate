@@ -1,6 +1,6 @@
 <header class="masthead" data-controller="toggle">
   <div class="container masthead__inner">
-    <%= link_to "teeeemplate", user_signed_in? ? dashboard_path : root_path, class: "masthead__brand" %>
+    <%= link_to app_name, user_signed_in? ? dashboard_path : root_path, class: "masthead__brand" %>
 
     <% if Current.user %>
       <nav class="masthead__nav" aria-label="Main">

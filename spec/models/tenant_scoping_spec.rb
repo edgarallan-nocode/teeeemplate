@@ -23,7 +23,7 @@ RSpec.describe "tenant scoping" do
   end
 
   it "finds the models it is supposed to be guarding" do
-    expect(tenant_models.map(&:name)).to include("Project", "Membership", "Subscription")
+    expect(tenant_models.map(&:name)).to include("Membership", "Subscription")
   end
 
   it "requires every model with a team_id to include TenantScoped" do
@@ -45,35 +45,43 @@ RSpec.describe "tenant scoping" do
     expect(without_validation).to be_empty
   end
 
+  # Exercised against Subscription rather than the example Project, so these
+  # guarantees survive `bin/remove-example`. The example resource must be
+  # deletable without taking the tenancy tests with it.
   describe "TenantScoped behaviour" do
     it "assigns Current.team on create when no team is given" do
       team = create(:team)
+
       acting_as(create(:user), team: team) do
         Current.team = team
-        expect(Project.create!(name: "Inferred").team).to eq(team)
+        record = Subscription.create!(stripe_subscription_id: "sub_inferred")
+        expect(record.team).to eq(team)
       end
     end
 
     it "does not override an explicitly assigned team" do
       other = create(:team)
+
       acting_as(create(:user), team: create(:team)) do
-        expect(Project.create!(name: "Explicit", team: other).team).to eq(other)
+        record = Subscription.create!(stripe_subscription_id: "sub_explicit", team: other)
+        expect(record.team).to eq(other)
       end
     end
 
     it "refuses to save without any team at all" do
       Current.reset
-      project = Project.new(name: "Homeless")
-      expect(project).not_to be_valid
-      expect(project.errors[:team]).to be_present
+
+      record = Subscription.new(stripe_subscription_id: "sub_homeless")
+      expect(record).not_to be_valid
+      expect(record.errors[:team]).to be_present
     end
 
     it "scopes with .for_team" do
-      a = create(:project)
-      b = create(:project)
+      a = create(:subscription)
+      b = create(:subscription)
 
-      expect(Project.for_team(a.team)).to contain_exactly(a)
-      expect(Project.for_team(b.team)).to contain_exactly(b)
+      expect(Subscription.for_team(a.team)).to contain_exactly(a)
+      expect(Subscription.for_team(b.team)).to contain_exactly(b)
     end
   end
 end

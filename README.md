@@ -47,6 +47,8 @@ Development mail is captured at <http://localhost:3000/dev/letter_opener>.
 | `bin/test` | RSpec. Arguments pass through: `bin/test spec/policies` |
 | `bin/lint` | RuboCop, Brakeman, bundler-audit. `--fix` to autocorrect |
 | `bin/ci` | Everything CI runs, in the same order |
+| `bin/rename-app "Acme CRM"` | Turn this starter into a new application |
+| `bin/remove-example` | Delete the example `Project` resource |
 
 ## The one rule that matters
 
@@ -332,15 +334,89 @@ stubbing verification away — they exercise the real `construct_event` path.
 
 ## Starting a real project from this
 
-1. Rename the `Teeeemplate` module (`config/application.rb`, `config/*.yml`,
-   `app/views/layouts/`, `README.md`).
-2. Delete the example resource: the `Project` model, policy, controller, views,
-   specs, and its migration.
-3. Replace the placeholder copy in `app/views/public/pages/terms.html.erb` and
-   `privacy.html.erb` with real text before taking a payment.
-4. Set your own plans in `config/plans.yml` and your price ids in credentials.
-5. Rotate credentials — generate fresh ones rather than inheriting these.
-6. Point `abstracts/_variables.scss` at your own palette and type.
+Keep this repository as the template and generate apps from it. Two things make
+that work: the rename is scripted, and the template stays connected so you can
+pull improvements into apps you have already started.
+
+### 1. Make it a template repository
+
+On GitHub, **Settings → Template repository**. Then each new app is
+**Use this template → Create a new repository**, which gives you a clean repo
+with no inherited history.
+
+If you would rather keep the history and the connection:
+
+```bash
+git clone <template-repo-url> acme-crm
+cd acme-crm
+git remote rename origin upstream
+git remote add origin <new-repo-url>
+```
+
+### 2. Rename it
+
+```bash
+bin/rename-app "Acme CRM"
+```
+
+Rewrites the Ruby module (`Teeeemplate` → `AcmeCrm`), the database, cache and
+cable names, the package name and the docs. It also deletes the template's
+encrypted credentials, because a new application must have its own
+`secret_key_base` rather than inherit one.
+
+The product's *display* name is not scattered through templates — it lives at
+`config.x.app_name` and views read it through the `app_name` helper, so the
+script sets it in one place.
+
+### 3. Set it up and check it
+
+```bash
+bin/setup
+bin/ci
+```
+
+`bin/ci` passing on a fresh rename is the signal that nothing was missed.
+
+### 4. Delete the example resource
+
+```bash
+bin/remove-example
+```
+
+`Project` exists to demonstrate tenant scoping end to end — model, policy,
+controller, views and isolation specs. Read `spec/requests/projects_spec.rb`
+first; it is the reference for how a scoped resource should be tested. The
+script removes the code and adds a migration to drop the table, then lists the
+prose references it deliberately left for you.
+
+### 5. Make it yours
+
+- Replace `terms.html.erb` and `privacy.html.erb` before taking a payment
+- Set your plans in `config/plans.yml` and your price ids in credentials
+- Point `abstracts/_variables.scss` at your palette and type
+- `dropdb teeeemplate_development teeeemplate_test` once you are happy
+
+### Pulling template improvements into an existing app
+
+This is the reason to keep the template as a real repository rather than a
+one-time copy. When you fix something here — a security default, a gem bump, a
+better spec helper — existing apps can take it:
+
+```bash
+git fetch upstream
+git merge upstream/main        # or: git cherry-pick <sha>
+```
+
+Expect conflicts in anything you renamed or customised, and none in the parts
+you have not touched. Two habits keep it manageable:
+
+- **Make template fixes in the template**, then merge down. Fixing the same bug
+  separately in three apps guarantees three different fixes.
+- **Keep your changes additive** where you can. New files merge cleanly; edits
+  to `application_controller.rb` do not.
+
+If an app has diverged too far to merge, cherry-pick the specific commit. That
+is still better than reimplementing it from memory.
 
 ## What this deliberately does not have
 

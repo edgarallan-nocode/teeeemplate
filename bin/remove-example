@@ -1,0 +1,243 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Delete the example Project resource.
+#
+# Project exists only to demonstrate the tenant-scoping pattern end to end:
+# model, policy, controller, views, factory and isolation specs. Once you have
+# a real tenant-owned model, delete it.
+#
+# Read spec/requests/projects_spec.rb before you do. It is the reference for
+# how a scoped resource is meant to be tested, and the shared example it uses
+# should be applied to whatever replaces it.
+#
+# Every edit below is anchored to exact text. If an anchor is missing, this
+# script stops rather than leaving the application half-modified — a partial
+# removal that still boots is much harder to debug than a clean failure.
+
+require "fileutils"
+
+ROOT = File.expand_path("..", __dir__)
+Dir.chdir(ROOT)
+
+def say(msg)  = puts("\n\e[1m==> #{msg}\e[0m")
+def item(msg) = puts("  #{msg}")
+def fail!(msg)
+  warn("\n\e[31m#{msg}\e[0m")
+  exit 1
+end
+
+unless File.exist?("app/models/project.rb")
+  fail! "The example resource is already gone."
+end
+
+unless ARGV.include?("--yes")
+  puts <<~PREVIEW
+    This removes the example Project resource: its model, policy, controller,
+    views, factory and specs; its associations on Team and User; its section of
+    the dashboard and the admin team page; its seed data; and it adds a
+    migration to drop the table.
+  PREVIEW
+  print "\nContinue? [y/N] "
+  fail!("Aborted. Nothing was changed.") unless $stdin.gets.to_s.strip.downcase.start_with?("y")
+end
+
+# --- Files -----------------------------------------------------------------
+say "Removing files"
+%w[
+  app/models/project.rb
+  app/policies/project_policy.rb
+  app/controllers/projects_controller.rb
+  app/views/projects
+  spec/factories/projects.rb
+  spec/requests/projects_spec.rb
+].each do |path|
+  next unless File.exist?(path)
+
+  FileUtils.rm_rf(path)
+  item path
+end
+
+# --- Anchored edits --------------------------------------------------------
+# [file, exact text to remove or replace, replacement]
+EDITS = [
+  ["config/routes.rb", "  resources :projects\n\n", ""],
+
+  ["app/models/team.rb", "  has_many :projects, dependent: :destroy\n", ""],
+
+  ["app/models/user.rb",
+   "  has_many :owned_projects, class_name: \"Project\", foreign_key: :created_by_id,\n" \
+   "                            dependent: :nullify, inverse_of: :created_by\n", ""],
+
+  ["app/controllers/dashboard_controller.rb",
+   "    # Everything here starts from the team, not from the model class.\n" \
+   "    @projects = policy_scope(current_team.projects.active.recent.limit(5))\n" \
+   "    @members",
+   "    # Everything here starts from the team, not from the model class.\n" \
+   "    @members"],
+
+  ["app/controllers/admin/teams_controller.rb",
+   "      @subscription = @team.subscription\n      @project_count = @team.projects.count\n",
+   "      @subscription = @team.subscription\n"],
+
+  ["app/views/admin/teams/show.html.erb",
+   "      <dt>Projects</dt>\n      <dd class=\"numeric\"><%= @project_count %></dd>\n", ""],
+
+  ["app/views/shared/_masthead.html.erb",
+   "        <%= link_to \"Projects\", projects_path, class: \"nav-link\",\n" \
+   "              \"aria-current\": controller_name == \"projects\" ? \"page\" : nil %>\n", ""],
+
+  ["app/views/shared/_masthead.html.erb",
+   "        <%= link_to \"Projects\", projects_path, class: \"nav-link\" %>\n", ""],
+
+]
+
+say "Editing source"
+EDITS.each do |path, old, new|
+  contents = File.read(path)
+  unless contents.include?(old)
+    fail! <<~MSG
+      Could not find the expected text in #{path}:
+
+      #{old.lines.first(3).map { |l| "    #{l}" }.join}
+      The file has changed since this script was written. Remove the example by
+      hand, then update bin/remove-example so the next application does not hit
+      this. Nothing else has been modified.
+    MSG
+  end
+
+  File.write(path, contents.sub(old, new))
+  item path
+end
+
+# --- Blocks that are easier to rewrite than to patch -----------------------
+say "Rewriting the dashboard"
+dashboard = File.read("app/views/dashboard/show.html.erb")
+start = dashboard.index("<div class=\"split\">")
+fail!("app/views/dashboard/show.html.erb no longer has the expected layout.") if start.nil?
+
+File.write("app/views/dashboard/show.html.erb", <<~ERB)
+  <% content_for :title, current_team.name %>
+
+  <%= page_title current_team.name, description: "Everything below is scoped to this team." %>
+
+  <div class="split">
+    <div>
+      <div class="empty">
+        <p class="empty__title">Nothing here yet</p>
+        <p>
+          This is where your application's tenant-scoped content goes. Start every
+          query from <code>current_team</code>, never from the model class.
+        </p>
+      </div>
+    </div>
+
+    <aside class="stack--loose stack">
+      <section class="panel panel--sunken">
+        <div class="panel__header"><h2>Team</h2></div>
+        <div class="stat">
+          <span class="stat__value numeric"><%= current_team.seat_count %></span>
+          <span class="stat__label">Members</span>
+        </div>
+        <% if @pending_invitations.positive? %>
+          <p class="muted" style="margin-top: var(--space-4);">
+            <%= pluralize(@pending_invitations, "invitation") %> pending.
+          </p>
+        <% end %>
+        <p style="margin-top: var(--space-4);">
+          <%= link_to "Manage members", team_members_path(current_team), class: "btn btn--sm" %>
+        </p>
+      </section>
+
+      <% if policy(billing_subject_for(current_team)).show? %>
+        <section class="panel panel--sunken">
+          <div class="panel__header"><h2>Billing</h2></div>
+          <p><%= subscription_badge(current_team.subscription) %></p>
+          <p style="margin-top: var(--space-4);">
+            <%= link_to "Billing settings", billing_subscription_path, class: "btn btn--sm" %>
+          </p>
+        </section>
+      <% end %>
+    </aside>
+  </div>
+ERB
+item "app/views/dashboard/show.html.erb"
+
+say "Rewriting seeds"
+seeds = File.read("db/seeds.rb")
+open_tag  = "# --- Tenant data -----------------------------------------------------------"
+close_tag = "# --- A pending invitation --------------------------------------------------"
+if seeds.include?(open_tag) && seeds.include?(close_tag)
+  seeds[seeds.index(open_tag)...seeds.index(close_tag)] = ""
+  File.write("db/seeds.rb", seeds)
+  item "db/seeds.rb"
+else
+  item "db/seeds.rb unchanged - remove the project seeds by hand"
+end
+
+say "Trimming specs"
+touched = []
+{
+  "spec/requests/dashboard_spec.rb" => /\n  it "shows only the active team's projects" do.*?\n  end\n/m,
+  "spec/system/team_workflow_spec.rb" => /\n  it "creates a team, adds a project.*?\n  end\n/m,
+  # The whole ProjectPolicy group goes with the policy it describes.
+  "spec/policies/policies_spec.rb" => /\n  describe ProjectPolicy do.*?\n  end\n/m
+}.each do |path, pattern|
+  next unless File.exist?(path)
+
+  contents = File.read(path)
+  next unless contents.match?(pattern)
+
+  File.write(path, contents.sub(pattern, "\n"))
+  touched << path
+  item path
+end
+
+# Removing an example leaves whitespace that depends on whether it was the
+# first, last or middle one in its block. Rather than out-guess that, let
+# RuboCop tidy exactly the files that were touched.
+unless touched.empty?
+  say "Tidying whitespace"
+  if system("bundle exec rubocop --autocorrect --only Layout --force-exclusion " \
+            "#{touched.join(' ')} > /dev/null 2>&1")
+    item "rubocop --autocorrect"
+  else
+    item "rubocop could not run; check `bin/lint` output by hand"
+  end
+end
+
+# --- Migration -------------------------------------------------------------
+say "Adding a migration to drop the table"
+timestamp = Time.now.utc.strftime("%Y%m%d%H%M%S")
+path = "db/migrate/#{timestamp}_drop_projects.rb"
+File.write(path, <<~RUBY_MIGRATION)
+  # frozen_string_literal: true
+
+  # The example tenant-scoped resource has served its purpose.
+  class DropProjects < ActiveRecord::Migration[8.1]
+    def up
+      # if_exists so this is safe on a clone that never ran the original
+      # create_projects migration.
+      drop_table :projects, if_exists: true
+    end
+
+    def down
+      raise ActiveRecord::IrreversibleMigration,
+            "The example Project resource was removed deliberately. Model your " \\
+            "own tenant-owned table rather than restoring this one."
+    end
+  end
+RUBY_MIGRATION
+item path
+
+say "Done"
+puts <<~NEXT
+
+    bin/rails db:migrate
+    bin/ci
+
+  A few mentions of "project" survive in prose - the tenant-scoping comment in
+  app/models/concerns/tenant_scoped.rb, the marketing copy, and the README.
+  They are examples in text, not code, and are left for you to reword.
+
+NEXT

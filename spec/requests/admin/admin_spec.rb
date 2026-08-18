@@ -32,10 +32,9 @@ RSpec.describe "Platform admin" do
       # still treats another team's record as non-existent: platform admin is
       # staff access to this install, not membership of every team.
       admin_with_team = create(:user, :admin, :with_team)
-      project = create(:project, team: tenant.team)
 
       sign_in admin_with_team
-      get project_path(project)
+      get team_members_path(tenant.team)
 
       expect(response).to have_http_status(:not_found)
     end
@@ -65,8 +64,8 @@ RSpec.describe "Platform admin" do
 
       get admin_team_path(tenant.team)
 
-      expect(response.body).to include(tenant.team.name)
-      expect(response.body).to include(tenant.owner.email)
+      expect(response.body).to include(html(tenant.team.name))
+      expect(response.body).to include(html(tenant.owner.email))
       expect(response.body).to include("Past due")
     end
 
@@ -78,7 +77,7 @@ RSpec.describe "Platform admin" do
 
       get admin_subscriptions_path, params: { status: "canceled" }
 
-      expect(response.body).to include(tenant.team.name)
+      expect(response.body).to include(html(tenant.team.name))
       expect(response.body).not_to include("sub_active_one")
     end
   end

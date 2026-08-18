@@ -1,0 +1,110 @@
+#!/usr/bin/env bash
+# Turn this starter into a new application.
+#
+#   bin/rename-app "Acme CRM"
+#
+# Rewrites the Ruby module, the database and cache names, the package name and
+# the documentation. The product's *display* name is not touched here — it
+# lives in one place (config.x.app_name) and this script sets it there.
+#
+# What it deliberately does NOT do: touch git history or delete the example
+# Project resource. Both are prompted for at the end, because both are
+# irreversible and you may want neither.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+OLD_MODULE="Teeeemplate"
+OLD_SLUG="teeeemplate"
+
+say()  { printf "\n\033[1m==> %s\033[0m\n" "$1"; }
+note() { printf "\033[33m%s\033[0m\n" "$1"; }
+fail() { printf "\033[31m%s\033[0m\n" "$1" >&2; exit 1; }
+
+DISPLAY_NAME="${1:-}"
+[ -n "$DISPLAY_NAME" ] || fail "Usage: bin/rename-app \"Acme CRM\" [--yes]"
+
+ASSUME_YES=false
+[ "${2:-}" = "--yes" ] && ASSUME_YES=true
+
+# "Acme CRM" -> AcmeCrm (module) and acme_crm (identifiers).
+MODULE="$(printf '%s' "$DISPLAY_NAME" | ruby -e 'puts STDIN.read.strip.gsub(/[^a-zA-Z0-9]+/, " ").split.map(&:capitalize).join')"
+SLUG="$(printf '%s' "$DISPLAY_NAME"   | ruby -e 'puts STDIN.read.strip.gsub(/[^a-zA-Z0-9]+/, "_").downcase.squeeze("_").sub(/\A_/, "").sub(/_\z/, "")')"
+
+[ -n "$MODULE" ] || fail "Could not derive a Ruby module name from \"$DISPLAY_NAME\"."
+printf '%s' "$MODULE" | grep -qE '^[A-Z]' || fail "A Ruby module must start with a letter: got \"$MODULE\"."
+
+if [ "$MODULE" = "$OLD_MODULE" ]; then
+  fail "That is already the name of this application."
+fi
+
+say "About to rename"
+cat <<EOF
+  display name   ${DISPLAY_NAME}
+  Ruby module    ${OLD_MODULE} -> ${MODULE}
+  identifiers    ${OLD_SLUG} -> ${SLUG}
+                 (databases, cache namespace, cable prefix, package name)
+EOF
+
+if [ "$ASSUME_YES" = false ]; then
+  printf "\nContinue? [y/N] "
+  read -r reply
+  case "$reply" in [yY]*) ;; *) fail "Aborted. Nothing was changed." ;; esac
+fi
+
+say "Rewriting source"
+# Ordered: module first (it is a strict subset of nothing), then the slug.
+# node_modules and .git are excluded; package-lock.json is regenerated instead.
+FILES="$(git ls-files | grep -vE '^(package-lock\.json)$')"
+
+printf '%s\n' "$FILES" | while IFS= read -r file; do
+  [ -f "$file" ] || continue
+  if grep -qi "$OLD_SLUG" "$file" 2>/dev/null; then
+    perl -pi -e "s/\Q${OLD_MODULE}\E/${MODULE}/g; s/\Q${OLD_SLUG}\E/${SLUG}/g" "$file"
+    echo "  $file"
+  fi
+done
+
+say "Setting the display name"
+perl -pi -e "s/ENV\.fetch\(\"APP_NAME\", \"[^\"]*\"\)/ENV.fetch(\"APP_NAME\", \"${DISPLAY_NAME}\")/" config/application.rb
+grep -n "app_name" config/application.rb | sed 's/^/  /'
+
+say "Regenerating credentials"
+# The template's encrypted credentials must never be inherited: a new
+# application needs its own secret_key_base and its own keys, and the old
+# ciphertext is unreadable without the template's key anyway.
+rm -f config/credentials.yml.enc config/master.key
+rm -f config/credentials/development.yml.enc config/credentials/development.key
+rm -f config/credentials/production.yml.enc config/credentials/production.key
+echo "  removed the template's credentials; bin/setup will generate fresh ones"
+
+say "Refreshing lockfiles"
+npm install --package-lock-only --silent >/dev/null 2>&1 && echo "  package-lock.json" || note "  npm install failed; run it by hand"
+
+say "Renamed"
+cat <<EOF
+
+  Next:
+
+    1. bin/setup                      create databases, credentials, seeds
+    2. bin/ci                         confirm everything still passes
+    3. bin/remove-example             delete the example Project resource
+    4. Replace the placeholder text in app/views/public/pages/terms.html.erb
+       and privacy.html.erb before taking a payment.
+    5. Put your Stripe test keys in credentials:
+       bin/rails credentials:edit --environment development
+
+  The old databases (${OLD_SLUG}_development, ${OLD_SLUG}_test) are still on
+  disk. Drop them when you are happy:
+
+    dropdb ${OLD_SLUG}_development && dropdb ${OLD_SLUG}_test
+
+  To start a fresh git history instead of inheriting the template's:
+
+    rm -rf .git && git init && git add -A && git commit -m "Initial commit"
+
+  To keep the template's history and pull future improvements from it:
+
+    git remote add upstream <template-repo-url>
+    git fetch upstream && git merge upstream/main
+
+EOF

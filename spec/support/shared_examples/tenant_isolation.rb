@@ -45,7 +45,7 @@ RSpec.shared_examples "a tenant-isolated resource" do
     get collection_path
 
     expect(response).to have_http_status(:ok)
-    expect(response.body).not_to include(CGI.escapeHTML(their_record.name)) if their_record.respond_to?(:name)
+    expect(response.body).not_to include(html(their_record.name)) if their_record.respond_to?(:name)
   end
 
   it "refuses to update another team's record" do

@@ -111,13 +111,14 @@ RSpec.describe "Teams" do
     let(:tenant) { create_tenant }
 
     it "lets an owner delete the team and everything in it" do
-      create(:project, team: tenant.team)
+      create(:team_invitation, team: tenant.team)
 
       sign_in tenant.owner
       delete team_path(tenant.team)
 
       expect(Team.exists?(tenant.team.id)).to be(false)
-      expect(Project.where(team_id: tenant.team.id)).to be_empty
+      expect(Membership.where(team_id: tenant.team.id)).to be_empty
+      expect(TeamInvitation.where(team_id: tenant.team.id)).to be_empty
     end
 
     it "does not let a member delete the team" do

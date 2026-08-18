@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 module ApplicationHelper
+  # The product's display name. Set it once in config/application.rb (or with
+  # the APP_NAME environment variable); never write it into a template.
+  def app_name = Rails.configuration.x.app_name
+
   # Maps a subscription status to a badge variant, so status colour is decided
   # in one place rather than in each view that happens to render one.
   def subscription_badge(subscription)

@@ -40,6 +40,7 @@ RSpec.configure do |config|
   config.include AuthenticationHelpers
   config.include TenancyHelpers
   config.include StripeHelpers
+  config.include HtmlHelpers
 
   # Job assertions (have_enqueued_job, perform_enqueued_jobs) are useful in
   # model and service specs too, not only in request specs.
