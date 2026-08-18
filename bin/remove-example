@@ -17,6 +17,13 @@
 
 require "fileutils"
 
+# Source files in this project contain UTF-8 (em dashes in comments, mostly).
+# Ruby reads files using the ambient locale, which is US-ASCII when LANG is
+# unset - common on CI runners and bare server shells - and every File.read
+# below would then raise on the first non-ASCII byte.
+Encoding.default_external = Encoding::UTF_8
+Encoding.default_internal = Encoding::UTF_8
+
 ROOT = File.expand_path("..", __dir__)
 Dir.chdir(ROOT)
 
@@ -31,6 +38,21 @@ unless File.exist?("app/models/project.rb")
   fail! "The example resource is already gone."
 end
 
+# Models that ship with the starter and are not a worked example of anything.
+BUILT_IN_TENANT_MODELS = %w[membership subscription team_invitation project].freeze
+
+# Has anyone built a tenant-scoped model of their own yet? If not, deleting
+# Project throws away the only worked example right before it is needed.
+def own_tenant_models
+  Dir["app/models/**/*.rb"].filter_map do |path|
+    name = File.basename(path, ".rb")
+    next if BUILT_IN_TENANT_MODELS.include?(name)
+    next unless File.read(path).match?(/^\s*include TenantScoped\b/)
+
+    name
+  end
+end
+
 unless ARGV.include?("--yes")
   puts <<~PREVIEW
     This removes the example Project resource: its model, policy, controller,
@@ -38,6 +60,24 @@ unless ARGV.include?("--yes")
     the dashboard and the admin team page; its seed data; and it adds a
     migration to drop the table.
   PREVIEW
+
+  mine = own_tenant_models
+  if mine.empty?
+    puts <<~WARNING
+
+      \e[33mNothing in app/models includes TenantScoped except the models that
+      ship with this starter, so it looks like you have not built a
+      tenant-owned model of your own yet.
+
+      Project is the worked example of that pattern - the thing you copy for
+      your first real resource, and the shape the isolation shared example is
+      applied to. Deleting it now removes the reference right before you need
+      it. Consider building your own resource first.\e[0m
+    WARNING
+  else
+    puts "\n  Your own tenant-scoped models: #{mine.join(', ')}"
+  end
+
   print "\nContinue? [y/N] "
   fail!("Aborted. Nothing was changed.") unless $stdin.gets.to_s.strip.downcase.start_with?("y")
 end

@@ -377,24 +377,40 @@ bin/ci
 
 `bin/ci` passing on a fresh rename is the signal that nothing was missed.
 
-### 4. Delete the example resource
-
-```bash
-bin/remove-example
-```
-
-`Project` exists to demonstrate tenant scoping end to end — model, policy,
-controller, views and isolation specs. Read `spec/requests/projects_spec.rb`
-first; it is the reference for how a scoped resource should be tested. The
-script removes the code and adds a migration to drop the table, then lists the
-prose references it deliberately left for you.
-
-### 5. Make it yours
+### 4. Make it yours
 
 - Replace `terms.html.erb` and `privacy.html.erb` before taking a payment
 - Set your plans in `config/plans.yml` and your price ids in credentials
 - Point `abstracts/_variables.scss` at your palette and type
 - `dropdb teeeemplate_development teeeemplate_test` once you are happy
+
+### Later: delete the example resource
+
+**Not during setup.** `Project` is the worked example of tenant scoping —
+model, policy, a controller that starts every query from
+`current_team.projects`, views, and the isolation shared example. It is what
+you copy when you build your first real tenant-owned model, so deleting it on
+day one throws away the reference right before you need it.
+
+Build your own scoped resource first. Copy the shape from `app/models/project.rb`
+and `app/controllers/projects_controller.rb`, and apply the shared example in
+`spec/support/shared_examples/tenant_isolation.rb` to it. Once that works:
+
+```bash
+bin/remove-example
+bin/rails db:migrate
+bin/ci
+```
+
+Left in place, `Project` is dead code you ship: a live `/projects` route and
+table any team member can write to, nav links and a dashboard panel for a
+feature that does not exist, seed data inventing fake projects, and — the
+expensive one — no way for a new developer or a coding agent to tell
+scaffolding from real domain.
+
+The script deletes the code, associations, routes, views, seeds and specs,
+adds a migration to drop the table, and lists the prose references it
+deliberately left for you.
 
 ### Pulling template improvements into an existing app
 

@@ -85,13 +85,16 @@ cat <<EOF
 
   Next:
 
-    1. bin/setup                      create databases, credentials, seeds
-    2. bin/ci                         confirm everything still passes
-    3. bin/remove-example             delete the example Project resource
-    4. Replace the placeholder text in app/views/public/pages/terms.html.erb
+    1. bin/setup       create databases, credentials, seed data
+    2. bin/ci          confirm the rename missed nothing
+    3. Replace the placeholder text in app/views/public/pages/terms.html.erb
        and privacy.html.erb before taking a payment.
-    5. Put your Stripe test keys in credentials:
+    4. Put your Stripe test keys in credentials:
        bin/rails credentials:edit --environment development
+
+  Keep the example Project resource for now. It is the worked example of
+  tenant scoping and the thing you copy when building your first real
+  tenant-owned model. Run bin/remove-example once you no longer need it.
 
   The old databases (${OLD_SLUG}_development, ${OLD_SLUG}_test) are still on
   disk. Drop them when you are happy:
