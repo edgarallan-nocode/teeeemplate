@@ -33,19 +33,30 @@
 .grid {
   display: grid;
   gap: var(--space-5);
+  // Grid and flex children default to min-width: auto, which lets wide content
+  // (a table, a long code line) push the whole layout past the viewport rather
+  // than scrolling inside its own container. Every track and child here is
+  // explicitly allowed to shrink.
+  grid-template-columns: minmax(0, 1fr);
+
+  > * { min-width: 0; }
 }
 
-.grid--2 { @include sm { grid-template-columns: repeat(2, 1fr); } }
-.grid--3 { @include md { grid-template-columns: repeat(3, 1fr); } }
+.grid--2 { @include sm { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.grid--3 { @include md { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 .grid--4 {
-  @include sm { grid-template-columns: repeat(2, 1fr); }
-  @include lg { grid-template-columns: repeat(4, 1fr); }
+  @include sm { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  @include lg { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 
 // Main content beside a narrow rail. Collapses to one column on small screens.
 .split {
   display: grid;
   gap: var(--space-6);
+  // minmax(0, 1fr) rather than 1fr, at every breakpoint — see .grid above.
+  grid-template-columns: minmax(0, 1fr);
+
+  > * { min-width: 0; }
 
   @include md {
     grid-template-columns: minmax(0, 1fr) 18rem;
@@ -56,6 +67,9 @@
 .split--rail-first {
   @include md { grid-template-columns: 16rem minmax(0, 1fr); }
 }
+
+// Panels hold tables, so they need to be shrinkable too.
+.panel { min-width: 0; }
 
 // A hairline separator that carries the editorial feel.
 .rule {

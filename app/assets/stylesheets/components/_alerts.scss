@@ -54,17 +54,24 @@
 .toasts {
   position: fixed;
   z-index: 60;
-  right: var(--space-4);
-  bottom: var(--space-4);
-  left: var(--space-4);
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  padding: var(--space-4);
   display: flex;
   flex-direction: column;
+  align-items: stretch;
   gap: var(--space-2);
   pointer-events: none;
 
+  // Anchored from the left with an explicit viewport width, never with
+  // `right:`. A fixed element's insets resolve against the initial containing
+  // block, which some engines grow to the document's scroll width — anchoring
+  // from the right would then drift off screen on any page with overflow.
   @media (min-width: 40rem) {
-    left: auto;
-    width: min(26rem, calc(100vw - 2 * var(--space-4)));
+    align-items: flex-end;
+
+    .alert { width: min(26rem, 100%); }
   }
 
   .alert {

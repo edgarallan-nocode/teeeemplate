@@ -38,8 +38,8 @@
   border-bottom: var(--border);
   margin-bottom: var(--space-6);
 
-  @media (min-width: 40rem) { grid-template-columns: repeat(2, 1fr); }
-  @media (min-width: 68rem) { grid-template-columns: repeat(4, 1fr); }
+  @media (min-width: 40rem) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  @media (min-width: 68rem) { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 
   .stat {
     padding: var(--space-5) var(--space-4) var(--space-5) 0;

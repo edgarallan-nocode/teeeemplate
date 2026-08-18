@@ -7,6 +7,10 @@ html {
   tab-size: 4;
 }
 
+// The page itself never scrolls sideways. Wide content — tables, code — is
+// wrapped in its own overflow-x container instead. See the scroll-x mixin.
+html, body { overflow-x: clip; }
+
 body,
 h1, h2, h3, h4, h5, h6,
 p, figure, blockquote, dl, dd,

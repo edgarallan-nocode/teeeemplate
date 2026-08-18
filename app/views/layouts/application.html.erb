@@ -20,14 +20,14 @@
     <%= render "shared/masthead" %>
 
     <main class="container" id="main">
-      <%= render "shared/flashes" %>
       <%= yield %>
     </main>
 
     <%= render "shared/footer" %>
 
-    <%# The single modal frame. Any link with data-turbo-frame="modal_content" %>
-    <%# opens inside it. %>
+    <%# Fixed overlays are direct children of body. Nesting them inside the %>
+    <%# padded .container makes their positioning depend on page layout. %>
+    <%= render "shared/flashes" %>
     <%= render "shared/modal" %>
   </body>
 </html>
