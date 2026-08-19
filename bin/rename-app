@@ -52,9 +52,24 @@ if [ "$ASSUME_YES" = false ]; then
 fi
 
 say "Rewriting source"
-# Ordered: module first (it is a strict subset of nothing), then the slug.
-# node_modules and .git are excluded; package-lock.json is regenerated instead.
-FILES="$(git ls-files | grep -vE '^(package-lock\.json)$')"
+# git ls-files is the accurate list, but a ZIP download of the template has no
+# repository, so fall back to walking the tree. package-lock.json is excluded
+# either way and regenerated below.
+if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  FILES="$(git ls-files | grep -vE '^package-lock\.json$')"
+else
+  note "Not a git repository - walking the file tree instead."
+  FILES="$(find . -type f \
+    -not -path './.git/*' \
+    -not -path './node_modules/*' \
+    -not -path './tmp/*' \
+    -not -path './log/*' \
+    -not -path './storage/*' \
+    -not -path './coverage/*' \
+    -not -path './app/assets/builds/*' \
+    -not -name 'package-lock.json' \
+    -not -name '*.woff2' | sed 's|^\./||')"
+fi
 
 printf '%s\n' "$FILES" | while IFS= read -r file; do
   [ -f "$file" ] || continue
@@ -68,14 +83,17 @@ say "Setting the display name"
 perl -pi -e "s/ENV\.fetch\(\"APP_NAME\", \"[^\"]*\"\)/ENV.fetch(\"APP_NAME\", \"${DISPLAY_NAME}\")/" config/application.rb
 grep -n "app_name" config/application.rb | sed 's/^/  /'
 
-say "Regenerating credentials"
-# The template's encrypted credentials must never be inherited: a new
-# application needs its own secret_key_base and its own keys, and the old
-# ciphertext is unreadable without the template's key anyway.
+say "Handing credentials over to this application"
+# The starter ships none of its own - an encrypted file whose key is gitignored
+# is unreadable to anyone who clones it. Clear anything left over locally, then
+# stop ignoring .enc files: from here on this is a real application, and
+# committing its encrypted credentials is how production gets its secrets.
 rm -f config/credentials.yml.enc config/master.key
 rm -f config/credentials/development.yml.enc config/credentials/development.key
 rm -f config/credentials/production.yml.enc config/credentials/production.key
-echo "  removed the template's credentials; bin/setup will generate fresh ones"
+perl -0pi -e 's{\n# This starter ships no credentials.*?/config/credentials/\*\.yml\.enc\n}{}s' .gitignore
+echo "  cleared any local credentials; bin/setup will generate fresh ones"
+echo "  .gitignore now lets this application commit its own .enc files"
 
 say "Refreshing lockfiles"
 npm install --package-lock-only --silent >/dev/null 2>&1 && echo "  package-lock.json" || note "  npm install failed; run it by hand"

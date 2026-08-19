@@ -238,6 +238,13 @@ Credentials are per-environment: `config/credentials/development.yml.enc` and
 `config/credentials/production.yml.enc`. Their `.key` files are gitignored and
 must never be committed. Production supplies `RAILS_MASTER_KEY` externally.
 
+**This starter ships no credentials of its own.** An encrypted file whose key
+is gitignored is unreadable to everyone who clones the repository, so shipping
+one would only break `bin/setup` on first run. `bin/setup` generates
+development credentials per machine, and `.gitignore` excludes `.enc` files
+until `bin/rename-app` hands them over — after that your application commits
+its own, which is the Rails convention and how production gets its secrets.
+
 ```bash
 bin/rails credentials:edit --environment production
 ```

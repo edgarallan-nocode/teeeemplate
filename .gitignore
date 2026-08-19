@@ -31,9 +31,20 @@
 
 /public/assets
 
-# Ignore key files for decrypting credentials and more. Never commit these.
+# Never commit credential keys.
 /config/*.key
 /config/credentials/*.key
+
+# This starter ships no credentials of its own. An encrypted file whose key is
+# gitignored is unreadable to everyone who clones the repository, so shipping
+# one only breaks `bin/setup` on first run. Development credentials are
+# generated per-machine by bin/setup.
+#
+# YOUR application should commit its own .enc files - that is the Rails
+# convention and how production gets its secrets. Delete these two lines once
+# bin/rename-app removes this block for you.
+/config/credentials.yml.enc
+/config/credentials/*.yml.enc
 
 
 /app/assets/builds/*
