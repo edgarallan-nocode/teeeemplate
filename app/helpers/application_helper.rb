@@ -5,6 +5,10 @@ module ApplicationHelper
   # the APP_NAME environment variable); never write it into a template.
   def app_name = Rails.configuration.x.app_name
 
+  # Sign in with Google is on when a Google OAuth client is configured and off
+  # otherwise; the button is the only thing that asks.
+  def google_sign_in_enabled? = Rails.configuration.x.google_client_id.present?
+
   # Maps a subscription status to a badge variant, so status colour is decided
   # in one place rather than in each view that happens to render one.
   def subscription_badge(subscription)
@@ -49,6 +53,10 @@ module ApplicationHelper
   def billing_subject_for(team)
     team.subscription || Subscription.new(team_id: team.id)
   end
+
+  # A rich text field, sanitised on the way out. The one way editor HTML reaches
+  # a template — see RichText.
+  def rich_text(html) = RichText.render(html)
 
   def page_title(title, description: nil, &actions)
     render "shared/page_header", title: title, description: description, actions: actions

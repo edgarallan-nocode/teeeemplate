@@ -50,6 +50,18 @@ Development mail is captured at <http://localhost:3000/dev/letter_opener>.
 | `bin/rename-app "Acme CRM"` | Turn this starter into a new application |
 | `bin/remove-example` | Delete the example `Project` resource |
 
+### Conventions
+
+Two documents, and they do not overlap. [SKILL.md](SKILL.md) is the
+architectural contract — tenant scoping, Pundit, services, the Stripe webhook,
+secrets. [STYLE.md](STYLE.md) is the style guide — naming, comments, and the
+idioms used in controllers, ERB, Stimulus, SASS and specs. Mechanical formatting
+belongs to neither; `.rubocop.yml` owns it and `bin/lint` enforces it.
+
+The design system has a third form: **`/styleguide`** renders it from itself —
+real components, the real stylesheet, the real Stimulus controllers, so it cannot
+drift. Open in development and test; platform admins only in production.
+
 ## The one rule that matters
 
 Every record belongs to a team, and **every query starts from the team**:
@@ -141,11 +153,16 @@ no result monad beyond `Result#success?`.
 ### Frontend
 
 Server-rendered ERB, Turbo Drive for navigation, Turbo Frames and Streams for
-partial updates, and seven Stimulus controllers for the rest: `dropdown`,
-`modal`, `tabs`, `clipboard`, `autosubmit`, `toggle`, `flash`.
+partial updates, and eight Stimulus controllers for the rest: `dropdown`,
+`modal`, `tabs`, `clipboard`, `autosubmit`, `toggle`, `flash`, and
+`rich-text-editor`.
 
 esbuild bundles the JavaScript, so a real npm package can be added when one
-earns its place. There is no SPA, no React or Vue, and no Tailwind.
+earns its place. TipTap (ProseMirror) is the one that has: the rich text editor
+on a project's description, with a floating toolbar, a `/` block menu, tables,
+YouTube embeds and pictures uploaded to Active Storage — S3 in production. What
+it produces is sanitised by `RichText` on the way in and the way out. There is
+no SPA, no React or Vue, and no Tailwind.
 
 ### Styling
 
@@ -230,7 +247,7 @@ The split is deliberate:
 
 | Goes in | What |
 |---|---|
-| **Rails credentials** (encrypted, committed) | Stripe keys, Stripe webhook secret, Stripe price ids, Sentry DSN |
+| **Rails credentials** (encrypted, committed) | Stripe keys, Stripe webhook secret, Stripe price ids, Sentry DSN, and — optionally — `google.{client_id,client_secret}` |
 | **Environment variables** (`.env.example`) | `DATABASE_URL`, `REDIS_URL`, `APP_HOST`, ports, thread counts, AWS region and bucket |
 | **Nowhere** | AWS access keys — see below |
 

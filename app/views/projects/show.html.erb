@@ -13,7 +13,7 @@
 <div class="split">
   <div class="stack">
     <% if @project.description.present? %>
-      <p class="lede"><%= simple_format @project.description %></p>
+      <div class="rich-text"><%= rich_text @project.description %></div>
     <% else %>
       <p class="quiet">No description.</p>
     <% end %>

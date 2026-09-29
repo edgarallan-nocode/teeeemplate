@@ -3,6 +3,10 @@
 Read **[SKILL.md](SKILL.md)** before writing or modifying code. It is the
 architectural contract for this repository and it is short.
 
+**[STYLE.md](STYLE.md)** covers the other half: naming, idiom, and how the ERB,
+Stimulus, SASS and specs here are written. SKILL.md decides what you build;
+STYLE.md decides what it looks like.
+
 The three things that catch people out:
 
 1. **Every query starts from the team.** `current_team.projects.find(id)`, never

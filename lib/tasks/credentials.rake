@@ -17,6 +17,13 @@ namespace :credentials do
 
     sentry:
       dsn:
+
+    # Optional. Sign in with Google — an OAuth client from Google Cloud Console
+    # whose authorised redirect URI is http://localhost:3000/users/auth/google_oauth2/callback.
+    # Blank hides the button.
+    google:
+      client_id:
+      client_secret:
   YAML
 
   desc "Create config/credentials/development.yml.enc if it does not exist yet"

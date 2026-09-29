@@ -45,6 +45,51 @@ RSpec.describe "Projects" do
     end
   end
 
+  describe "the description" do
+    let(:tenant) { create_tenant }
+
+    before { sign_in tenant.member }
+
+    it "mounts the editor over the two hidden fields" do
+      get new_project_path
+
+      expect(response.body).to include(%(data-controller="rich-text-editor"))
+      expect(response.body).to include(%(data-rich-text-editor-target="html"))
+      expect(response.body).to include(%(data-rich-text-editor-target="json"))
+    end
+
+    it "saves the HTML and the editor's JSON, and renders the HTML sanitised" do
+      json = { type: "doc", content: [ { type: "heading", attrs: { level: 1 }, content: [ { type: "text", text: "Scope" } ] } ] }
+
+      post projects_path, params: { project: {
+        name: "Relaunch", description: "<h1>Scope</h1><p>Two pages.</p><script>alert(1)</script>", content: json.to_json
+      } }
+
+      project = Project.find_by!(name: "Relaunch")
+      expect(project.description).to eq("<h1>Scope</h1><p>Two pages.</p>")
+      expect(project.content["content"].first["type"]).to eq("heading")
+
+      get project_path(project)
+      expect(response.body).to include("<h1>Scope</h1>")
+      expect(response.body).not_to include("<script>")
+    end
+
+    it "lands as no description when the editor was left empty" do
+      post projects_path, params: { project: { name: "Blank", description: "<p></p>" } }
+
+      expect(Project.find_by!(name: "Blank").description).to be_nil
+    end
+
+    it "summarises the words, not the markup, in the list" do
+      create(:project, team: tenant.team, name: "Marked up", description: "<h2>Scope</h2><p>Two <em>pages</em>.</p>")
+
+      get projects_path
+
+      expect(response.body).to include("Scope Two pages.")
+      expect(response.body).not_to include("<h2>Scope</h2>")
+    end
+  end
+
   describe "authorization" do
     let(:tenant) { create_tenant }
     let!(:project) { create(:project, team: tenant.team) }

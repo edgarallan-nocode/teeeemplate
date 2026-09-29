@@ -26,7 +26,6 @@ RSpec.describe "Team workflow" do
 
     click_link "New project"
     fill_in "Name", with: "First project"
-    fill_in "Description", with: "Belongs to Acme Widgets."
     click_button "Create Project"
 
     expect(page).to have_content("Project created")

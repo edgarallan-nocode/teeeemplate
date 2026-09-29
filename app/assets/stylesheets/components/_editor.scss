@@ -1,0 +1,378 @@
+// The rich text editor and what it produces.
+//
+// Three layers, all on the same tokens so dark mode falls out of the palette:
+//
+//   .editor / .rich-text   the text itself — one mixin, applied to the editing
+//                          surface and to a rendered document, so the two agree
+//   .editor-toolbar,       the floating layers: a formatting toolbar over a
+//   .slash-menu,           selection, the `/` block menu at the caret, and the
+//   .editor-popover        small prompts for a link, an image or a video. They
+//                          float, so they are the boxes that earn a shadow —
+//                          the same one the dropdown menu carries.
+@use "../abstracts/breakpoints" as *;
+@use "../abstracts/mixins" as *;
+
+// --- The text ---------------------------------------------------------------
+
+@mixin rich-content {
+  color: var(--ink);
+  font-size: var(--text-md);
+  line-height: var(--leading-loose);
+
+  > * + * { margin-top: var(--space-3); }
+
+  h1, h2, h3 {
+    margin-top: var(--space-5);
+    color: var(--ink);
+    line-height: var(--leading-tight);
+  }
+  h1 { font-size: var(--text-2xl); }
+  h2 { font-size: var(--text-xl); }
+  h3 { font-size: var(--text-lg); }
+  > h1:first-child, > h2:first-child, > h3:first-child { margin-top: 0; }
+
+  a {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  code {
+    padding: 0.1em 0.35em;
+    border-radius: var(--radius);
+    background-color: var(--paper-sunken);
+    border: var(--border);
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+  }
+
+  pre {
+    padding: var(--space-4);
+    overflow-x: auto;
+    border: var(--border);
+    border-radius: var(--radius);
+    background-color: var(--paper-sunken);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+    tab-size: 2;
+
+    code {
+      padding: 0;
+      border: 0;
+      background: none;
+      font-size: inherit;
+    }
+  }
+
+  blockquote {
+    padding-left: var(--space-4);
+    border-left: 2px solid var(--rule-strong);
+    color: var(--ink-secondary);
+  }
+
+  ul, ol { padding-left: var(--space-5); }
+  li + li { margin-top: var(--space-1); }
+  li > p { margin: 0; }
+
+  hr {
+    border: 0;
+    border-top: var(--border);
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
+    border-radius: var(--radius);
+  }
+
+  // The starter table wraps itself for horizontal scroll; a rendered document
+  // does not, so both the wrapper and the table itself scroll safely.
+  .tableWrapper { @include scroll-x; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    font-size: var(--text-sm);
+
+    th, td {
+      position: relative;
+      min-width: 4rem;
+      padding: var(--space-2) var(--space-3);
+      border: var(--border);
+      text-align: left;
+      vertical-align: top;
+
+      > * { margin: 0; }
+    }
+    th {
+      background-color: var(--paper-sunken);
+      font-weight: var(--weight-bold);
+    }
+    .selectedCell::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-color: var(--accent-wash);
+      pointer-events: none;
+    }
+  }
+
+  [data-youtube-video] {
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: var(--radius);
+    background-color: var(--paper-sunken);
+
+    iframe {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+  }
+
+}
+
+.rich-text { @include rich-content; }
+
+.editor {
+  position: relative;
+  border: var(--border);
+  border-radius: var(--radius);
+  background-color: var(--paper-raised);
+  transition: border-color var(--transition);
+
+  &:focus-within { border-color: var(--ink);border-width: 2px; }
+}
+
+// The ProseMirror surface. The class is set through editorProps.
+.editor__content {
+  @include rich-content;
+  min-height: 22rem;
+  padding: var(--space-3);
+  outline: none;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+
+  // The placeholder, drawn by the Placeholder extension's data attribute on the
+  // one empty paragraph.
+  > .is-editor-empty:first-child::before {
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    color: var(--ink-tertiary);
+    pointer-events: none;
+  }
+
+  .ProseMirror-selectednode {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .ProseMirror-gapcursor::after { border-top-color: var(--ink); }
+}
+
+// --- The floating layers ----------------------------------------------------
+
+@mixin floating-panel {
+  position: fixed;
+  z-index: 60;
+  background-color: var(--paper-raised);
+  border: var(--border-strong);
+  // A floating layer over the page — the one place a shadow is allowed, and the
+  // same one .dropdown__menu uses. Nothing in the flow gets one.
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.editor-toolbar {
+  @include floating-panel;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+
+  &[hidden] { display: none; }
+}
+
+.editor-toolbar__group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+
+  &[hidden] { display: none; }
+}
+
+.editor-toolbar__divider {
+  width: 1px;
+  height: 1.25rem;
+  margin: 0 var(--space-1);
+  background-color: var(--rule);
+
+  &[hidden] { display: none; }
+}
+
+.editor-toolbar__button,
+.editor-toolbar__select {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  height: 1.75rem;
+  padding: 0 var(--space-2);
+  border: 0;
+  border-radius: var(--radius);
+  background: none;
+  color: var(--ink-secondary);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: background-color var(--transition), color var(--transition);
+
+  &:hover { background-color: var(--paper-sunken); color: var(--ink); }
+  &:focus-visible { @include focus-ring; outline-offset: -2px; }
+  &[aria-pressed="true"] { background-color: var(--paper-sunken); color: var(--ink); }
+  &[hidden] { display: none; }
+
+  svg { flex: none; }
+}
+
+.editor-toolbar__button { width: 1.75rem; padding: 0; justify-content: center; }
+.editor-toolbar__button:has(.editor-toolbar__caption) { width: auto; padding: 0 var(--space-2); }
+.editor-toolbar__caption { font-size: var(--text-xs); }
+
+.editor-toolbar__select { padding-right: var(--space-1); }
+
+.editor-toolbar__language {
+  height: 1.75rem;
+  padding: 0 var(--space-2);
+  border: 0;
+  border-radius: var(--radius);
+  background-color: transparent;
+  color: var(--ink-secondary);
+  font-size: var(--text-sm);
+
+  &:hover { background-color: var(--paper-sunken); }
+  &[hidden] { display: none; }
+}
+
+.editor-dropdown { position: relative; }
+
+// The list a toolbar dropdown opens, and the rows of the slash menu: one look.
+@mixin menu-row {
+  display: grid;
+  grid-template-columns: 1.25rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: 0.4rem var(--space-3);
+  border: 0;
+  border-radius: var(--radius);
+  background: none;
+  color: var(--ink);
+  font-size: var(--text-base);
+  text-align: left;
+  cursor: pointer;
+
+  &:hover, &[aria-selected="true"] { background-color: var(--paper-sunken); }
+  &:focus-visible { @include focus-ring; outline-offset: -2px; }
+}
+
+.editor-menu {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  left: 0;
+  z-index: 61;
+  min-width: 11rem;
+  padding: var(--space-1);
+  background-color: var(--paper-raised);
+  border: var(--border-strong);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+  &[hidden] { display: none; }
+}
+
+.editor-menu__item { @include menu-row; padding-block: 0.3rem; font-size: var(--text-sm); }
+.editor-menu__icon { display: inline-flex; color: var(--ink-tertiary); }
+.editor-menu__check { display: none; color: var(--ink); }
+.editor-menu__item[aria-selected="true"] .editor-menu__check { display: inline-flex; }
+
+.slash-menu {
+  @include floating-panel;
+  width: 17rem;
+  max-height: min(24rem, calc(100vh - 2rem));
+  padding: var(--space-2);
+  overflow-y: auto;
+}
+
+.slash-menu__label {
+  @include label;
+  padding: var(--space-2) var(--space-3) var(--space-1);
+  color: var(--ink-tertiary);
+}
+
+.slash-menu__divider {
+  height: 0;
+  margin: var(--space-2) 0;
+  border: 0;
+  border-top: var(--border);
+}
+
+.slash-menu__item { @include menu-row; }
+.slash-menu__item--back { color: var(--ink-secondary); }
+.slash-menu__icon { display: inline-flex; color: var(--ink-tertiary); }
+.slash-menu__text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.slash-menu__chevron { display: inline-flex; color: var(--ink-tertiary); }
+
+.slash-menu__empty {
+  padding: var(--space-3);
+  color: var(--ink-tertiary);
+  font-size: var(--text-sm);
+}
+
+.slash-menu__filter {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  padding: var(--space-2) var(--space-3) var(--space-1);
+  border-top: var(--border);
+  color: var(--ink-secondary);
+  font-size: var(--text-sm);
+}
+.slash-menu__slash { color: var(--ink-tertiary); }
+.slash-menu__placeholder { color: var(--ink-tertiary); }
+
+.editor-popover {
+  @include floating-panel;
+  width: 20rem;
+  max-width: calc(100vw - 1rem);
+  padding: var(--space-3);
+
+  &[hidden] { display: none; }
+}
+
+.editor-popover__title {
+  @include label;
+  margin-bottom: var(--space-2);
+  color: var(--ink-tertiary);
+}
+
+.editor-popover__form {
+  display: flex;
+  gap: var(--space-2);
+
+  .input { flex: 1 1 auto; min-width: 0; }
+}
+
+.editor-popover__form--stacked {
+  flex-direction: column;
+  align-items: flex-start;
+
+  .input { width: 100%; }
+}
+
+.editor-popover__error {
+  color: var(--critical);
+  font-size: var(--text-sm);
+
+  &[hidden] { display: none; }
+}

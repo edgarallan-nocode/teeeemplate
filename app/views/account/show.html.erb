@@ -50,6 +50,40 @@
         </div>
       <% end %>
     </section>
+
+    <% if google_sign_in_enabled? %>
+      <hr class="rule">
+
+      <section>
+        <h2>Sign in with Google</h2>
+        <% if @user.google_connected? %>
+          <p class="muted" style="margin-top: var(--space-2);">
+            Google is connected. You can sign in with it or with your password.
+            Disconnecting leaves the password as the only way in, so it asks for
+            it first — if you signed up with Google and never set one, use
+            <%= link_to "Forgot your password?", new_user_password_path %> to create one before you disconnect.
+          </p>
+          <%= form_with url: google_account_path, method: :delete, class: "form",
+                style: "margin-top: var(--space-4);" do |f| %>
+            <div class="field">
+              <%= f.label :current_password, "Your password", class: "field__label" %>
+              <%= f.password_field :current_password, autocomplete: "current-password", class: "input" %>
+            </div>
+            <div class="form-actions">
+              <%= f.submit "Disconnect Google", class: "btn" %>
+            </div>
+          <% end %>
+        <% else %>
+          <p class="muted" style="margin-top: var(--space-2);">
+            Connect a Google account and you can sign in with it instead of a
+            password. Your email address here stays as it is.
+          </p>
+          <div style="margin-top: var(--space-4); max-width: 20rem;">
+            <%= render "users/shared/google_button", label: "Connect Google" %>
+          </div>
+        <% end %>
+      </section>
+    <% end %>
   </div>
 
   <aside class="stack">

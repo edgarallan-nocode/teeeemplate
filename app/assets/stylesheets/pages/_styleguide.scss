@@ -1,0 +1,167 @@
+// The design system's own page. Chrome only.
+//
+// Everything this page *documents* — colour, type, spacing, components — comes
+// from the real partials. Nothing here redefines a token or restyles a
+// component, because a style guide that carries its own copy of the system
+// stops describing the system the moment one of them changes.
+//
+// Prefixed `sg-` so none of it can collide with the classes on display.
+
+@use "../abstracts/mixins" as *;
+@use "../abstracts/breakpoints" as *;
+
+.sg-laws {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+  margin: var(--space-5) 0 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    @include label;
+
+    &::before {
+      content: "\00d7";
+      margin-right: var(--space-2);
+      color: var(--accent);
+      font-weight: var(--weight-display);
+    }
+
+    &.is-yes::before { content: "\2192"; }
+  }
+}
+
+.sg-section { padding-block: var(--space-7); border-bottom: var(--border); }
+
+.sg-section__head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: baseline;
+  justify-content: space-between;
+  padding-bottom: var(--space-3);
+  margin-bottom: var(--space-6);
+  border-bottom: var(--border);
+}
+
+.sg-section__note {
+  max-width: 34rem;
+  font-size: var(--text-sm);
+  color: var(--ink-tertiary);
+}
+
+.sg-sub {
+  @include label;
+  display: block;
+  padding-bottom: var(--space-2);
+  margin-bottom: var(--space-4);
+  border-bottom: var(--border);
+}
+
+.sg-sub:not(:first-child) { margin-top: var(--space-7); }
+
+// --- Colour ----------------------------------------------------------------
+
+.sg-swatch { border: var(--border); background-color: var(--paper-raised); }
+
+.sg-swatch__chip { height: 5.5rem; border-bottom: var(--border); }
+
+// The semantic pairs show the wash with its ink as a rule beneath it, which is
+// how they are actually used together on an alert.
+.sg-swatch__chip--washed { border-bottom-width: 3px; }
+
+.sg-swatch__meta {
+  display: flex;
+  gap: var(--space-3);
+  align-items: baseline;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-3) 0;
+}
+
+.sg-swatch__name { font-family: var(--font-mono); font-size: var(--text-xs); }
+
+.sg-swatch__use {
+  padding: var(--space-2) var(--space-3) var(--space-3);
+  font-size: var(--text-xs);
+  line-height: var(--leading-snug);
+  color: var(--ink-tertiary);
+}
+
+// --- Type ------------------------------------------------------------------
+
+.sg-type {
+  display: grid;
+  gap: var(--space-3);
+  padding-block: var(--space-4);
+  border-bottom: var(--border);
+  grid-template-columns: minmax(0, 1fr);
+
+  @include md {
+    grid-template-columns: 9rem minmax(0, 1fr);
+    gap: var(--space-5);
+    align-items: baseline;
+  }
+}
+
+.sg-type__label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--ink-tertiary);
+
+  b { display: block; color: var(--ink); font-weight: var(--weight-normal); }
+}
+
+.sg-type__demo { min-width: 0; @include scroll-x; }
+
+// --- Ramps -----------------------------------------------------------------
+
+.sg-ramp { display: grid; gap: var(--space-2); }
+
+.sg-ramp__row {
+  display: grid;
+  grid-template-columns: 8rem 4.5rem minmax(0, 1fr);
+  gap: var(--space-3);
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--ink-tertiary);
+
+  b { color: var(--ink); font-weight: var(--weight-normal); }
+  span { font-variant-numeric: tabular-nums; }
+}
+
+.sg-ramp__bar { height: 0.75rem; max-width: 100%; background-color: var(--accent); }
+.sg-ramp__bar--rule { height: 0.4rem; background-color: var(--ink-tertiary); }
+
+// --- Component specimens ---------------------------------------------------
+
+.sg-spec {
+  display: grid;
+  gap: var(--space-4);
+  padding-block: var(--space-5);
+  border-bottom: var(--border);
+  grid-template-columns: minmax(0, 1fr);
+
+  @include md {
+    grid-template-columns: minmax(0, 1fr) 15rem;
+    gap: var(--space-6);
+    align-items: start;
+  }
+
+  > * { min-width: 0; }
+}
+
+.sg-spec__class {
+  display: block;
+  margin-bottom: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  word-break: break-word;
+}
+
+.sg-spec__note {
+  font-size: var(--text-xs);
+  line-height: var(--leading-snug);
+  color: var(--ink-tertiary);
+}

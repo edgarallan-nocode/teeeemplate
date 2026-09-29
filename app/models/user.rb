@@ -11,6 +11,7 @@
 #  email                  :string           default(""), not null
 #  encrypted_password     :string           default(""), not null
 #  first_name             :string
+#  google_uid             :string
 #  last_name              :string
 #  last_sign_in_at        :datetime
 #  last_sign_in_ip        :string
@@ -26,6 +27,7 @@
 #
 #  index_users_on_admin                 (admin) WHERE admin
 #  index_users_on_email                 (email) UNIQUE
+#  index_users_on_google_uid            (google_uid) UNIQUE WHERE (google_uid IS NOT NULL)
 #  index_users_on_last_team_id          (last_team_id)
 #  index_users_on_reset_password_token  (reset_password_token) UNIQUE
 #
@@ -38,7 +40,8 @@ class User < ApplicationRecord
   # addresses are not verified. See the RemoveConfirmableFromUsers migration
   # for what that trades away and how it is compensated for.
   devise :database_authenticatable, :registerable, :recoverable,
-         :rememberable, :validatable, :trackable
+         :rememberable, :validatable, :trackable,
+         :omniauthable, omniauth_providers: %i[google_oauth2]
 
   has_many :memberships, dependent: :destroy
   has_many :teams, through: :memberships
@@ -54,6 +57,11 @@ class User < ApplicationRecord
   belongs_to :last_team, class_name: "Team", optional: true
 
   validates :first_name, :last_name, length: { maximum: 100 }
+  # Google's stable subject id, set when a person signs up with Google or
+  # connects it from their account page. One Google account reaches one user:
+  # Users::SignInWithGoogle is the only writer, and the partial unique index is
+  # what stops two users claiming the same one.
+  validates :google_uid, uniqueness: true, allow_nil: true
 
   normalizes :email, with: ->(email) { email.to_s.strip.downcase }
 
@@ -83,6 +91,8 @@ class User < ApplicationRecord
   end
 
   def member_of?(team) = membership_for(team).present?
+
+  def google_connected? = google_uid.present?
 
   # Teams this user solely owns. Blocks account deletion when other people would
   # be stranded without an owner.

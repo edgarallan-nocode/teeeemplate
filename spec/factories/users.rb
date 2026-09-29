@@ -11,6 +11,7 @@
 #  email                  :string           default(""), not null
 #  encrypted_password     :string           default(""), not null
 #  first_name             :string
+#  google_uid             :string
 #  last_name              :string
 #  last_sign_in_at        :datetime
 #  last_sign_in_ip        :string
@@ -26,6 +27,7 @@
 #
 #  index_users_on_admin                 (admin) WHERE admin
 #  index_users_on_email                 (email) UNIQUE
+#  index_users_on_google_uid            (google_uid) UNIQUE WHERE (google_uid IS NOT NULL)
 #  index_users_on_last_team_id          (last_team_id)
 #  index_users_on_reset_password_token  (reset_password_token) UNIQUE
 #

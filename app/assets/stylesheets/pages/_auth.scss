@@ -36,3 +36,30 @@
   gap: var(--space-3);
   justify-content: space-between;
 }
+
+// "Continue with Google" above the password form. The button is the design
+// system's plain .btn with the Google mark in front; the divider is what keeps
+// the two ways in from reading as one form.
+.auth__google-form {
+  display: block;
+}
+
+.auth__google-mark {
+  flex: none;
+}
+
+.auth__divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-block: var(--space-5);
+  font-size: var(--text-sm);
+  color: var(--ink-secondary);
+
+  &::before,
+  &::after {
+    content: "";
+    flex: 1;
+    border-top: var(--border);
+  }
+}

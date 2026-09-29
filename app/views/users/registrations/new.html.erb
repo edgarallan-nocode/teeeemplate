@@ -5,6 +5,11 @@
     <h1 class="auth__title">Create your account</h1>
     <p class="auth__subtitle">You will pick a team name next.</p>
 
+    <% if google_sign_in_enabled? %>
+      <%= render "users/shared/google_button", label: "Continue with Google" %>
+      <p class="auth__divider"><span>or create one with a password</span></p>
+    <% end %>
+
     <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "form" }) do |f| %>
       <%= render "shared/form_errors", record: resource %>
 

@@ -65,5 +65,12 @@ module Teeeemplate
     config.x.app_protocol = ENV.fetch("APP_PROTOCOL", "http")
     config.x.mailer_from  = ENV.fetch("MAILER_FROM", "noreply@example.com")
     config.x.support_email = ENV.fetch("SUPPORT_EMAIL", "support@example.com")
+
+    # Sign in with Google: the OAuth client Google issued for this deployment.
+    # Optional — blank means off. The sign-in and sign-up pages only show the
+    # button when a client id is present, and nothing else in the application
+    # depends on it. See SKILL.md §2a.
+    config.x.google_client_id     = credentials.dig(:google, :client_id)
+    config.x.google_client_secret = credentials.dig(:google, :client_secret)
   end
 end

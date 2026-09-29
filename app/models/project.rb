@@ -33,11 +33,23 @@
 #
 class Project < ApplicationRecord
   include TenantScoped
+  # The pictures dropped into the description. See that file.
+  include EditorImages
 
   belongs_to :created_by, class_name: "User", optional: true
 
   validates :name, presence: true, length: { maximum: 120 }
-  validates :description, length: { maximum: 2_000 }
+  # `description` is HTML from the rich text editor and `content` is the editor's
+  # JSON for the same text. The HTML is canonical — it renders, it is searched, it
+  # is summarised in a list — and it goes through RichText before it is saved, so
+  # a row never holds anything a template would have to refuse. The JSON is a
+  # convenience for reopening the editor as it was left; when it is missing the
+  # editor rebuilds it from the HTML.
+  validates :description, length: { maximum: 100_000 }
+
+  # Sanitised before validation so the length limit applies to what is kept, and
+  # so an empty editor (`<p></p>`) lands as no description rather than an empty tag.
+  before_validation :sanitize_description, if: :description_changed?
 
   scope :active, -> { where(archived_at: nil) }
   scope :archived, -> { where.not(archived_at: nil) }
@@ -51,7 +63,30 @@ class Project < ApplicationRecord
 
   def archived? = archived_at.present?
 
+  # The description's words without the markup — what a list row shows.
+  def text = RichText.text(description)
+
+  # The form posts the editor's JSON as a string; the column is jsonb. Parsed
+  # here so a jsonb column never ends up holding a JSON *string*.
+  def content=(value)
+    super(value.is_a?(String) ? parse_content(value) : value)
+  end
+
   def archive! = update!(archived_at: Time.current)
 
   def unarchive! = update!(archived_at: nil)
+
+  private
+
+  def sanitize_description
+    self.description = RichText.blank?(description) ? nil : RichText.sanitize(description)
+  end
+
+  def parse_content(value)
+    return nil if value.blank?
+
+    JSON.parse(value)
+  rescue JSON::ParserError
+    nil
+  end
 end

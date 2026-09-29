@@ -29,7 +29,7 @@ FactoryBot.define do
   factory :project do
     team
     sequence(:name) { |n| "Project #{n}" }
-    description { Faker::Company.catch_phrase }
+    description { "<p>#{Faker::Company.catch_phrase}</p>" }
 
     trait :archived do
       archived_at { Time.current }

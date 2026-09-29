@@ -7,7 +7,8 @@ Rails.application.routes.draw do
   devise_for :users, controllers: {
     registrations: "users/registrations",
     sessions: "users/sessions",
-    passwords: "users/passwords"
+    passwords: "users/passwords",
+    omniauth_callbacks: "users/omniauth_callbacks"
   }
 
   # --- Public marketing shell ---------------------------------------------
@@ -21,7 +22,12 @@ Rails.application.routes.draw do
   # --- Signed-in application ----------------------------------------------
   get "dashboard", to: "dashboard#show", as: :dashboard
 
-  resources :projects
+  resources :projects do
+    # Where the description editor sends a dropped or chosen picture. Create
+    # only: the response is the address the editor puts in the text, and the
+    # picture then lives with the project. See Projects::ImagesController.
+    resources :images, only: :create, module: :projects
+  end
 
   resources :teams, only: %i[new create edit update destroy] do
     resource :switch, only: :create, module: :teams, as: :switch
@@ -39,6 +45,9 @@ Rails.application.routes.draw do
   # --- Account -------------------------------------------------------------
   resource :account, only: %i[show update destroy], controller: :account do
     get :confirm_delete
+    # Connecting Google is the OmniAuth request route above, reached while
+    # signed in; only disconnecting needs a route of its own.
+    delete :google, action: :disconnect_google
   end
 
   # --- Billing -------------------------------------------------------------
@@ -66,6 +75,12 @@ Rails.application.routes.draw do
     # Sidekiq's UI sits behind the same admin gate as everything else here.
     mount Sidekiq::Web => "/sidekiq"
   end
+
+  # --- Design system --------------------------------------------------------
+  # Open in development and test; platform admins only in production. The
+  # controller decides, not the router, so the route is the same everywhere and
+  # `rails routes` tells the truth in every environment.
+  get "styleguide", to: "styleguide#show"
 
   # --- Development-only -----------------------------------------------------
   mount LetterOpenerWeb::Engine, at: "/dev/letter_opener" if Rails.env.development?

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_18_205745) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_29_100000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -72,6 +72,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_18_205745) do
 
   create_table "projects", force: :cascade do |t|
     t.datetime "archived_at"
+    t.jsonb "content"
     t.datetime "created_at", null: false
     t.bigint "created_by_id"
     t.text "description"
@@ -154,6 +155,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_18_205745) do
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
     t.string "first_name"
+    t.string "google_uid"
     t.string "last_name"
     t.datetime "last_sign_in_at"
     t.string "last_sign_in_ip"
@@ -165,6 +167,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_18_205745) do
     t.datetime "updated_at", null: false
     t.index ["admin"], name: "index_users_on_admin", where: "admin"
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["google_uid"], name: "index_users_on_google_uid", unique: true, where: "(google_uid IS NOT NULL)"
     t.index ["last_team_id"], name: "index_users_on_last_team_id"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end

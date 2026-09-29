@@ -22,7 +22,7 @@
                 <tr>
                   <td>
                     <%= link_to project.name, project, class: "table__primary" %>
-                    <span class="table__secondary"><%= project.description.presence || "No description" %></span>
+                    <span class="table__secondary"><%= project.text.presence || "No description" %></span>
                   </td>
                   <td class="is-numeric quiet"><%= short_date(project.created_at) %></td>
                 </tr>

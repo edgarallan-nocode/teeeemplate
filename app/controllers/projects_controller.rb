@@ -66,6 +66,7 @@ class ProjectsController < ApplicationController
   end
 
   def project_params
-    params.expect(project: %i[name description])
+    # `description` is the editor's HTML and `content` its JSON — see Project.
+    params.expect(project: %i[name description content])
   end
 end

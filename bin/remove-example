@@ -55,10 +55,15 @@ end
 
 unless ARGV.include?("--yes")
   puts <<~PREVIEW
-    This removes the example Project resource: its model, policy, controller,
+    This removes the example Project resource: its model, policy, controllers,
     views, factory and specs; its associations on Team and User; its section of
     the dashboard and the admin team page; its seed data; and it adds a
     migration to drop the table.
+
+    The rich text editor stays. RichText, EditorImages, RichText::AttachImage,
+    the Stimulus controller and app/javascript/editor/ are generic — include
+    EditorImages on your own model and copy Projects::ImagesController to wire
+    them up again. Only the Project-specific pieces go.
   PREVIEW
 
   mine = own_tenant_models
@@ -88,9 +93,12 @@ say "Removing files"
   app/models/project.rb
   app/policies/project_policy.rb
   app/controllers/projects_controller.rb
+  app/controllers/projects
   app/views/projects
   spec/factories/projects.rb
   spec/requests/projects_spec.rb
+  spec/requests/projects
+  spec/system/rich_text_editor_spec.rb
 ].each do |path|
   next unless File.exist?(path)
 
@@ -101,7 +109,13 @@ end
 # --- Anchored edits --------------------------------------------------------
 # [file, exact text to remove or replace, replacement]
 EDITS = [
-  ["config/routes.rb", "  resources :projects\n\n", ""],
+  ["config/routes.rb",
+   "  resources :projects do\n" \
+   "    # Where the description editor sends a dropped or chosen picture. Create\n" \
+   "    # only: the response is the address the editor puts in the text, and the\n" \
+   "    # picture then lives with the project. See Projects::ImagesController.\n" \
+   "    resources :images, only: :create, module: :projects\n" \
+   "  end\n\n", ""],
 
   ["app/models/team.rb", "  has_many :projects, dependent: :destroy\n", ""],
 

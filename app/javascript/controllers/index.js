@@ -8,6 +8,7 @@ import DropdownController from "./dropdown_controller"
 import AutosubmitController from "./autosubmit_controller"
 import FlashController from "./flash_controller"
 import ModalController from "./modal_controller"
+import RichTextEditorController from "./rich_text_editor_controller"
 import TabsController from "./tabs_controller"
 import ToggleController from "./toggle_controller"
 
@@ -20,6 +21,7 @@ application.register("dropdown", DropdownController)
 application.register("autosubmit", AutosubmitController)
 application.register("flash", FlashController)
 application.register("modal", ModalController)
+application.register("rich-text-editor", RichTextEditorController)
 application.register("tabs", TabsController)
 application.register("toggle", ToggleController)
 

@@ -19,6 +19,8 @@ RSpec.describe "the example resource" do
     spec/requests/dashboard_spec.rb
     spec/system/team_workflow_spec.rb
     spec/models/example_resource_spec.rb
+    spec/requests/projects/images_spec.rb
+    spec/system/rich_text_editor_spec.rb
   ]
 
   it "is not depended on by any spec that outlives it" do
@@ -50,6 +52,7 @@ RSpec.describe "the example resource" do
       app/models/project.rb
       app/policies/project_policy.rb
       app/controllers/projects_controller.rb
+      app/controllers/projects/images_controller.rb
     ].freeze
 
     offenders = Rails.root.glob("app/**/*.rb").filter_map do |file|

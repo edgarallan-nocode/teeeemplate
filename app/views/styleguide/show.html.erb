@@ -1,0 +1,736 @@
+<%# The design system, rendered from itself. %>
+<%#                                                                          %>
+<%# Every component below is real markup using the real stylesheet, and the  %>
+<%# interactive ones are driven by the real Stimulus controllers. There is no %>
+<%# copy of a token or a component rule anywhere on this page — see          %>
+<%# pages/_styleguide.scss, which is chrome only.                            %>
+
+<% content_for :title, "Style guide" %>
+
+<%
+  ink_tokens = [
+    ["--ink",           "Body text, headings, structural borders. Near-black, not pure black."],
+    ["--ink-secondary", "Supporting copy and descriptions. The .muted role."],
+    ["--ink-tertiary",  "Labels, timestamps, placeholders. The .quiet role."]
+  ]
+
+  paper_tokens = [
+    ["--paper",        "The page. Off-white, so it reads as printed rather than lit."],
+    ["--paper-sunken", "Row hover, code blocks, recessed panels."],
+    ["--paper-raised", "Panels, inputs, menus — anything sitting above the page."]
+  ]
+
+  line_tokens = [
+    ["--rule",        "Hairline borders. The system's main separator."],
+    ["--rule-strong", "Structural borders — under a page header, above a table body."],
+    ["--accent",      "A single muted brick red. Hover, focus, one emphasis per screen."]
+  ]
+
+  state_tokens = [
+    ["--positive", "Active, succeeded, paid."],
+    ["--caution",  "Past due, unpaid, paused. Needs attention, not alarm."],
+    ["--critical", "Canceled, expired, destructive actions and errors."]
+  ]
+
+  type_scale = [
+    ["--text-3xl",  "clamp 2.75 → 4.5rem",     "display"],
+    ["--text-2xl",  "clamp 2.125 → 3.25rem",   "h1"],
+    ["--text-xl",   "clamp 1.625 → 2.125rem",  "h2"],
+    ["--text-lg",   "clamp 1.25 → 1.5rem",     "h3"],
+    ["--text-md",   "1.0625rem",               "h4 · lede"],
+    ["--text-base", "0.9375rem",               "body"],
+    ["--text-sm",   "0.8125rem",               "tables · forms"],
+    ["--text-xs",   "0.75rem",                 "labels"]
+  ]
+
+  spacing = [
+    ["--space-1", "0.25rem"], ["--space-2", "0.5rem"], ["--space-3", "0.75rem"],
+    ["--space-4", "1rem"],    ["--space-5", "1.5rem"], ["--space-6", "2rem"],
+    ["--space-7", "3rem"],    ["--space-8", "4rem"],   ["--space-9", "6rem"],
+    ["--space-10", "8rem"]
+  ]
+
+  widths = [
+    ["--width-narrow", "38rem"], ["--width-text", "46rem"],
+    ["--width-content", "64rem"], ["--width-wide", "84rem"]
+  ]
+%>
+
+<%= page_title "Style guide", description: "The design system, rendered from itself." %>
+
+<p class="lede">
+  Editorial by intent: strong type, generous whitespace, and hairline rules doing
+  the work a shadow would do elsewhere. One family, one accent, and a token for
+  every value. Everything below is live markup using
+  <code>application.scss</code> — if a component changes, this page changes with it.
+</p>
+
+<ul class="sg-laws">
+  <li>Border radius</li>
+  <li>Gradients</li>
+  <li>Decorative shadow</li>
+  <li>Second typeface</li>
+  <li>Utility classes</li>
+  <li class="is-yes">Hairlines</li>
+  <li class="is-yes">Tokens only</li>
+</ul>
+
+<%# ============================== COLOUR ============================== %>
+<section class="sg-section" id="colour">
+  <div class="sg-section__head">
+    <h2>Colour</h2>
+    <p class="sg-section__note">
+      Dark mode redefines these tokens and nothing else. No component carries a
+      dark-mode branch — if one needs to, the token set is wrong.
+    </p>
+  </div>
+
+  <span class="sg-sub">Ink — text, in three weights of emphasis</span>
+  <div class="grid grid--3">
+    <% ink_tokens.each do |token, use| %>
+      <div class="sg-swatch">
+        <div class="sg-swatch__chip" style="background-color: var(<%= token %>);"></div>
+        <div class="sg-swatch__meta"><span class="sg-swatch__name"><%= token %></span></div>
+        <p class="sg-swatch__use"><%= use %></p>
+      </div>
+    <% end %>
+  </div>
+
+  <span class="sg-sub">Paper — grounds</span>
+  <div class="grid grid--3">
+    <% paper_tokens.each do |token, use| %>
+      <div class="sg-swatch">
+        <div class="sg-swatch__chip" style="background-color: var(<%= token %>);"></div>
+        <div class="sg-swatch__meta"><span class="sg-swatch__name"><%= token %></span></div>
+        <p class="sg-swatch__use"><%= use %></p>
+      </div>
+    <% end %>
+  </div>
+
+  <span class="sg-sub">Rules and accent</span>
+  <div class="grid grid--3">
+    <% line_tokens.each do |token, use| %>
+      <div class="sg-swatch">
+        <div class="sg-swatch__chip" style="background-color: var(<%= token %>);"></div>
+        <div class="sg-swatch__meta"><span class="sg-swatch__name"><%= token %></span></div>
+        <p class="sg-swatch__use"><%= use %></p>
+      </div>
+    <% end %>
+  </div>
+
+  <span class="sg-sub">Semantic — state, never decoration</span>
+  <div class="grid grid--3">
+    <% state_tokens.each do |token, use| %>
+      <div class="sg-swatch">
+        <div class="sg-swatch__chip sg-swatch__chip--washed"
+             style="background-color: var(<%= token %>-wash); border-bottom-color: var(<%= token %>);"></div>
+        <div class="sg-swatch__meta">
+          <span class="sg-swatch__name"><%= token %></span>
+          <span class="sg-swatch__name quiet"><%= token %>-wash</span>
+        </div>
+        <p class="sg-swatch__use"><%= use %></p>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="alert alert--info" style="margin-top: var(--space-6);">
+    <div class="alert__body">
+      Colour is never the only signal. Every alert also carries a distinct left
+      border, every badge a border and a word. A reader who cannot separate red
+      from green still gets the message.
+    </div>
+  </div>
+</section>
+
+<%# =============================== TYPE =============================== %>
+<section class="sg-section" id="type">
+  <div class="sg-section__head">
+    <h2>Type</h2>
+    <p class="sg-section__note">
+      Lexend Deca, variable, weights 100–900, self-hosted. Display and body are
+      the same family — they separate by weight, size and tracking, never by
+      typeface.
+    </p>
+  </div>
+
+  <% type_scale.each do |token, size, role| %>
+    <div class="sg-type">
+      <div class="sg-type__label"><b><%= token %></b><%= size %><br><%= role %></div>
+      <div class="sg-type__demo">
+        <% case token %>
+        <% when "--text-3xl" %>
+          <span class="display">Start at the interesting part</span>
+        <% when "--text-2xl" %>
+          <h1>Every query starts from the team</h1>
+        <% when "--text-xl" %>
+          <h2>Billing belongs to the team</h2>
+        <% when "--text-lg" %>
+          <h3>The webhook is the source of truth</h3>
+        <% when "--text-md" %>
+          <p class="lede">A redirect back from Checkout means the browser came back, and nothing more.</p>
+        <% when "--text-base" %>
+          <p>Tenant scoping decides which records exist for you. Pundit decides what you may do with them. Both always apply, and neither substitutes for the other.</p>
+        <% when "--text-sm" %>
+          <p style="font-size: var(--text-sm);">Secondary interface text: table cells, field labels, button faces, alert bodies.</p>
+        <% when "--text-xs" %>
+          <span class="label">Small caps label</span>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <span class="sg-sub">Weights — one family, four jobs</span>
+  <div class="grid grid--2">
+    <div>
+      <p style="font-size: var(--text-lg); font-weight: var(--weight-normal);">Regular 400 — running text</p>
+      <p style="font-size: var(--text-lg); font-weight: var(--weight-medium);">Medium 500 — buttons, controls</p>
+    </div>
+    <div>
+      <p style="font-size: var(--text-lg); font-weight: var(--weight-bold);">Semibold 600 — emphasis, labels</p>
+      <p class="display" style="font-size: var(--text-lg);">Extrabold 800 — display</p>
+    </div>
+  </div>
+
+  <span class="sg-sub">Roles</span>
+  <div class="sg-spec">
+    <div>
+      <span class="label">Eyebrow above a heading</span>
+      <h3 style="margin-top: var(--space-2);">A section title</h3>
+      <p class="lede" style="margin-top: var(--space-3);">The lede sits under a title at reading width and carries secondary ink.</p>
+      <p class="muted" style="margin-top: var(--space-3);">Muted text for supporting detail.</p>
+      <p class="quiet" style="margin-top: var(--space-2);">Quiet text for timestamps and counts.</p>
+      <p class="numeric" style="margin-top: var(--space-3);">1,048,576 · 0.00 · 99.95</p>
+      <blockquote style="margin-top: var(--space-4);">A pull quote uses the display family at body size.</blockquote>
+    </div>
+    <div>
+      <span class="sg-spec__class">.label .lede .muted<br>.quiet .numeric</span>
+      <p class="sg-spec__note">
+        Type roles are classes, not ad-hoc styles. <code>.numeric</code> switches
+        on tabular figures so a column of digits lines up. Measure is capped at
+        <code>68ch</code> wherever text runs long.
+      </p>
+    </div>
+  </div>
+</section>
+
+<%# ============================== SPACE =============================== %>
+<section class="sg-section" id="space">
+  <div class="sg-section__head">
+    <h2>Space and measure</h2>
+    <p class="sg-section__note">
+      A 4px base. Steps get further apart as they get larger, because large gaps
+      need bigger jumps to read as different.
+    </p>
+  </div>
+
+  <span class="sg-sub">Spacing scale</span>
+  <div class="sg-ramp">
+    <% spacing.each do |token, size| %>
+      <div class="sg-ramp__row">
+        <b><%= token %></b><span><%= size %></span>
+        <div class="sg-ramp__bar" style="width: var(<%= token %>);"></div>
+      </div>
+    <% end %>
+  </div>
+
+  <span class="sg-sub">Container widths</span>
+  <div class="sg-ramp table-wrap">
+    <% widths.each do |token, size| %>
+      <div class="sg-ramp__row">
+        <b><%= token %></b><span><%= size %></span>
+        <div class="sg-ramp__bar sg-ramp__bar--rule" style="width: var(<%= token %>);"></div>
+      </div>
+    <% end %>
+  </div>
+
+  <span class="sg-sub">Breakpoints — three, mobile-first</span>
+  <div class="sg-ramp">
+    <div class="sg-ramp__row"><b>@include sm</b><span>40rem</span><span>640px — phone landscape and up</span></div>
+    <div class="sg-ramp__row"><b>@include md</b><span>52rem</span><span>832px — tablet and up</span></div>
+    <div class="sg-ramp__row"><b>@include lg</b><span>68rem</span><span>1088px — desktop and up</span></div>
+  </div>
+</section>
+
+<%# ============================= BUTTONS ============================== %>
+<section class="sg-section" id="buttons">
+  <div class="sg-section__head">
+    <h2>Buttons</h2>
+    <p class="sg-section__note">Square, hairline-bordered, and quiet until hovered.</p>
+  </div>
+
+  <div class="sg-spec">
+    <div class="button-row">
+      <button type="button" class="btn btn--primary">Create project</button>
+      <button type="button" class="btn">Cancel</button>
+      <button type="button" class="btn btn--ghost">Skip for now</button>
+      <button type="button" class="btn btn--danger">Delete team</button>
+    </div>
+    <div>
+      <span class="sg-spec__class">.btn--primary<br>.btn<br>.btn--ghost<br>.btn--danger</span>
+      <p class="sg-spec__note">
+        One primary per page — it marks the single most important action. Ghost
+        keeps a row of secondary actions from shouting. Danger reserves the
+        critical token for things that destroy data.
+      </p>
+    </div>
+  </div>
+
+  <div class="sg-spec">
+    <div class="button-row">
+      <button type="button" class="btn btn--sm">Small</button>
+      <button type="button" class="btn">Default</button>
+      <button type="button" class="btn btn--lg">Large</button>
+      <button type="button" class="btn" disabled>Disabled</button>
+      <span class="btn btn--sm" aria-disabled="true">Previous</span>
+    </div>
+    <div>
+      <span class="sg-spec__class">.btn--sm .btn--lg<br>[disabled]<br>[aria-disabled]</span>
+      <p class="sg-spec__note">
+        A control that is unavailable stays in place as
+        <code>aria-disabled</code> rather than disappearing, so the layout does
+        not jump and screen readers still announce it.
+      </p>
+    </div>
+  </div>
+
+  <div class="sg-spec">
+    <div>
+      <div class="button-row">
+        <button type="button" class="btn-link">Edit</button>
+        <button type="button" class="btn-link btn-link--danger">Remove</button>
+      </div>
+      <div style="max-width: 18rem; margin-top: var(--space-4);">
+        <button type="button" class="btn btn--primary btn--block">Sign in</button>
+      </div>
+    </div>
+    <div>
+      <span class="sg-spec__class">.btn-link<br>.btn--block</span>
+      <p class="sg-spec__note">
+        <code>.btn-link</code> is for actions inside a table row, where a real
+        button would shout. <code>.btn--block</code> fills its container.
+      </p>
+    </div>
+  </div>
+</section>
+
+<%# ============================== STATUS ============================== %>
+<section class="sg-section" id="status">
+  <div class="sg-section__head">
+    <h2>Status</h2>
+    <p class="sg-section__note">Badges are rectangles. This system does not do pills.</p>
+  </div>
+
+  <div class="sg-spec">
+    <div class="cluster">
+      <span class="badge badge--positive">Active</span>
+      <span class="badge badge--positive">Trialing</span>
+      <span class="badge badge--caution">Past due</span>
+      <span class="badge badge--critical">Canceled</span>
+      <span class="badge badge--accent">Owner</span>
+      <span class="badge badge--quiet">Member</span>
+    </div>
+    <div>
+      <span class="sg-spec__class">.badge--positive<br>.badge--caution<br>.badge--critical<br>.badge--accent .badge--quiet</span>
+      <p class="sg-spec__note">
+        Which variant a subscription status maps to is decided once, in
+        <code>subscription_badge</code>, not in each view that renders one.
+      </p>
+    </div>
+  </div>
+
+  <div class="sg-spec">
+    <div>
+      <%# The real flash controller drives these. timeout 0 keeps them put, %>
+      <%# since a style guide that empties itself after five seconds is no use. %>
+      <div class="alert alert--notice" data-controller="flash" data-flash-timeout-value="0">
+        <div class="alert__body">Project created.</div>
+        <button type="button" class="alert__dismiss" data-action="flash#dismiss" aria-label="Dismiss">&times;</button>
+      </div>
+      <div class="alert alert--warning" data-controller="flash" data-flash-timeout-value="0">
+        <div class="alert__body">Your card expires this month. Update it before the next invoice.</div>
+        <button type="button" class="alert__dismiss" data-action="flash#dismiss" aria-label="Dismiss">&times;</button>
+      </div>
+      <div class="alert alert--alert">
+        <div class="alert__body">That invitation has expired. Ask an admin to send a new one.</div>
+      </div>
+      <div class="alert alert--info">
+        <div class="alert__body">You are viewing this account as an administrator.</div>
+      </div>
+    </div>
+    <div>
+      <span class="sg-spec__class">.alert--notice<br>.alert--warning<br>.alert--alert<br>.alert--info</span>
+      <p class="sg-spec__note">
+        A 3px left border carries the variant, so the message survives a
+        greyscale print and a colour-blind reader. The first two dismiss —
+        that is the real <code>flash</code> controller. Errors are not
+        dismissible: a message telling you something went wrong should not
+        disappear before you have read it.
+      </p>
+    </div>
+  </div>
+
+  <div class="sg-spec">
+    <div class="grid grid--3">
+      <div><span class="stat__value">1,284</span><span class="stat__label">Teams</span></div>
+      <div><span class="stat__value">6,431</span><span class="stat__label">Members</span></div>
+      <div><span class="stat__value">$18,240</span><span class="stat__label">MRR</span></div>
+    </div>
+    <div>
+      <span class="sg-spec__class">.stat__value<br>.stat__label</span>
+      <p class="sg-spec__note">
+        A large display numeral over a small-caps label, with tabular figures so
+        a row of stats lines up.
+      </p>
+    </div>
+  </div>
+</section>
+
+<%# ============================== FORMS =============================== %>
+<section class="sg-section" id="forms">
+  <div class="sg-section__head">
+    <h2>Forms</h2>
+    <p class="sg-section__note">
+      Focus is a 1px inset ring rather than a glow — the same hairline logic as
+      everything else.
+    </p>
+  </div>
+
+  <div class="sg-spec">
+    <div class="form">
+      <div class="field">
+        <%= label_tag :sg_name, "Project name", class: "field__label" %>
+        <%= text_field_tag :sg_name, nil, class: "input", placeholder: "Quarterly report" %>
+        <p class="field__hint">Shown to everyone on your team.</p>
+      </div>
+      <div class="field">
+        <%= label_tag :sg_role, "Role", class: "field__label" %>
+        <%= select_tag :sg_role, options_for_select(%w[Member Admin Owner]), class: "select" %>
+      </div>
+      <div class="field">
+        <%= label_tag :sg_description, "Description", class: "field__label" %>
+        <%= text_area_tag :sg_description, nil, class: "textarea", placeholder: "What is this for?" %>
+      </div>
+      <%# The rich text editor, live: select text for the toolbar, type / for
+          the block menu. No upload address here, so a dropped picture is refused
+          in words rather than stored against nothing. %>
+      <div class="field" data-controller="rich-text-editor"
+           data-rich-text-editor-placeholder-value="Rich text. Select a word, or type / for a block…">
+        <%= label_tag :sg_rich_text, "Rich text", class: "field__label" %>
+        <%= hidden_field_tag :sg_rich_text, "<h2>Scope</h2><p>Two pages, one form, <strong>no</strong> surprises.</p>",
+              data: { rich_text_editor_target: "html" } %>
+        <%= hidden_field_tag :sg_rich_text_json, nil, data: { rich_text_editor_target: "json" } %>
+        <div class="editor" data-rich-text-editor-target="editor"></div>
+        <p class="field__hint">.editor .editor__content · .editor-toolbar · .slash-menu · .editor-popover · .rich-text</p>
+      </div>
+      <div class="field">
+        <%= label_tag :sg_email, "Email address", class: "field__label" %>
+        <%= email_field_tag :sg_email, "not-an-address", class: "input", "aria-invalid": "true" %>
+        <p class="field__error">Enter a valid email address.</p>
+      </div>
+      <div class="field">
+        <%= label_tag :sg_slug, "Team slug", class: "field__label" %>
+        <%= text_field_tag :sg_slug, "acme-crm", class: "input", disabled: true %>
+        <p class="field__hint">Set when the team was created.</p>
+      </div>
+    </div>
+    <div>
+      <span class="sg-spec__class">.field .field__label<br>.field__hint .field__error<br>.input .select .textarea</span>
+      <p class="sg-spec__note">
+        The select chevron is drawn with two gradients rather than a background
+        image, so there is no extra request and it inherits the current ink
+        colour in both themes.
+      </p>
+    </div>
+  </div>
+
+  <div class="sg-spec">
+    <div class="form">
+      <label class="choice">
+        <%= check_box_tag :sg_notify_join, "1", true, class: "choice__control" %>
+        <span class="choice__text">
+          Email me when a member joins
+          <span class="choice__hint">Sent to the address on your account.</span>
+        </span>
+      </label>
+      <label class="choice">
+        <%= check_box_tag :sg_notify_billing, "1", false, class: "choice__control" %>
+        <span class="choice__text">
+          Email me about failed payments
+          <span class="choice__hint">Owners always receive these.</span>
+        </span>
+      </label>
+      <div class="form-actions">
+        <button type="button" class="btn btn--primary">Save changes</button>
+        <button type="button" class="btn-link">Cancel</button>
+      </div>
+    </div>
+    <div>
+      <span class="sg-spec__class">.choice<br>.choice__control<br>.form-actions</span>
+      <p class="sg-spec__note">
+        The whole row is the label, so the hint text is a click target too.
+        <code>.form-actions</code> puts a rule above the buttons to close the form.
+      </p>
+    </div>
+  </div>
+
+  <div class="sg-spec">
+    <div class="form">
+      <div class="form-errors">
+        <p class="form-errors__title">2 errors stopped this from being saved</p>
+        <ul>
+          <li>Name can&rsquo;t be blank</li>
+          <li>Slug may only contain lowercase letters, numbers and hyphens</li>
+        </ul>
+      </div>
+
+      <%= form_with url: styleguide_path, method: :get, class: "filter-bar",
+            data: { controller: "autosubmit", action: "input->autosubmit#submit" } do %>
+        <%= search_field_tag :q, params[:q], placeholder: "Search projects", class: "input" %>
+        <noscript><%= submit_tag "Search", class: "btn btn--sm" %></noscript>
+      <% end %>
+    </div>
+    <div>
+      <span class="sg-spec__class">.form-errors<br>.filter-bar</span>
+      <p class="sg-spec__note">
+        <code>shared/_form_errors</code> renders whenever a create or update
+        re-renders with <code>:unprocessable_content</code>. The filter bar above
+        is live — it is the real <code>autosubmit</code> controller, debounced.
+      </p>
+    </div>
+  </div>
+</section>
+
+<%# =============================== DATA =============================== %>
+<section class="sg-section" id="data">
+  <div class="sg-section__head">
+    <h2>Data</h2>
+    <p class="sg-section__note">
+      Tables carry no vertical rules and no zebra striping. A hairline under each
+      row is enough.
+    </p>
+  </div>
+
+  <div class="sg-spec">
+    <div>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Project</th>
+              <th>Created by</th>
+              <th class="is-numeric">Created</th>
+              <th class="is-actions"><span class="visually-hidden">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <span class="table__primary">Quarterly report</span>
+                <span class="table__secondary">Revenue and headcount for the board</span>
+              </td>
+              <td class="muted">Ada Lovelace</td>
+              <td class="is-numeric quiet"><%= short_date(14.days.ago) %></td>
+              <td class="is-actions"><button type="button" class="btn-link">Edit</button></td>
+            </tr>
+            <tr>
+              <td>
+                <span class="table__primary">Onboarding rewrite</span>
+                <span class="table__secondary">Cut the sign-up flow to two screens</span>
+              </td>
+              <td class="muted">Grace Hopper</td>
+              <td class="is-numeric quiet"><%= short_date(26.days.ago) %></td>
+              <td class="is-actions"><button type="button" class="btn-link">Edit</button></td>
+            </tr>
+            <tr>
+              <td>
+                <span class="table__primary">Pricing experiment</span>
+                <span class="table__secondary">&mdash;</span>
+              </td>
+              <td class="muted">&mdash;</td>
+              <td class="is-numeric quiet"><%= short_date(nil) %></td>
+              <td class="is-actions"><button type="button" class="btn-link">Edit</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <nav class="pagination" aria-label="Pagination">
+        <span class="pagination__count numeric">1&ndash;3 of 47</span>
+        <div class="pagination__links">
+          <span class="btn btn--sm" aria-disabled="true">Previous</span>
+          <button type="button" class="btn btn--sm">Next</button>
+        </div>
+      </nav>
+    </div>
+    <div>
+      <span class="sg-spec__class">.table .table__primary<br>.table__secondary<br>.is-numeric .is-actions<br>.pagination</span>
+      <p class="sg-spec__note">
+        The actions column has a visually hidden header, so the table still
+        announces four columns. Missing values render as an em dash via
+        <code>short_date</code>, never as blank. Dates are absolute — support
+        questions need the actual day.
+      </p>
+    </div>
+  </div>
+
+  <div class="sg-spec">
+    <dl class="detail-list">
+      <dt>Team</dt><dd>Acme CRM</dd>
+      <dt>Plan</dt><dd>Team &middot; <span class="badge badge--positive">Active</span></dd>
+      <dt>Seats</dt><dd class="numeric">14</dd>
+      <dt>Renews</dt><dd><%= short_date(3.days.from_now) %></dd>
+    </dl>
+    <div>
+      <span class="sg-spec__class">.detail-list</span>
+      <p class="sg-spec__note">
+        A definition list for one record's attributes. Collapses to stacked rows
+        below <code>40rem</code>.
+      </p>
+    </div>
+  </div>
+
+  <div class="sg-spec">
+    <div class="empty">
+      <p class="empty__title">No projects yet</p>
+      <p>Create the first one to get started.</p>
+    </div>
+    <div>
+      <span class="sg-spec__class">.empty .empty__title</span>
+      <p class="sg-spec__note">
+        A dashed hairline, so an empty state reads as a placeholder rather than a
+        panel. Always distinguish <em>no records</em> from <em>nothing matched
+        your search</em>.
+      </p>
+    </div>
+  </div>
+</section>
+
+<%# ============================ SURFACES ============================== %>
+<section class="sg-section" id="surfaces">
+  <div class="sg-section__head">
+    <h2>Surfaces and navigation</h2>
+    <p class="sg-section__note">
+      The tabs, menu and disclosure below are the real Stimulus controllers, not
+      a copy of them.
+    </p>
+  </div>
+
+  <div class="sg-spec">
+    <div class="grid grid--2">
+      <div class="panel">
+        <div class="panel__header">
+          <h4>Subscription</h4>
+          <span class="badge badge--positive">Active</span>
+        </div>
+        <p class="muted" style="font-size: var(--text-sm);">Team plan, 14 seats, renewing next month.</p>
+      </div>
+      <div class="panel panel--sunken">
+        <div class="panel__header">
+          <h4>Seats</h4>
+          <span class="badge badge--quiet">Synced</span>
+        </div>
+        <p class="muted" style="font-size: var(--text-sm);">Quantity always equals the team's member count.</p>
+      </div>
+    </div>
+    <div>
+      <span class="sg-spec__class">.panel<br>.panel--sunken<br>.panel__header</span>
+      <p class="sg-spec__note">
+        A box with a hairline around it — not a card in the rounded-shadow sense.
+        The sunken variant drops the border and recedes instead.
+      </p>
+    </div>
+  </div>
+
+  <div class="sg-spec">
+    <div data-controller="tabs" data-tabs-active-value="details">
+      <div class="tabs__list" role="tablist">
+        <button type="button" class="tabs__tab" role="tab" data-tabs-target="tab" data-tab="details" data-action="tabs#select">Details</button>
+        <button type="button" class="tabs__tab" role="tab" data-tabs-target="tab" data-tab="members" data-action="tabs#select">Members</button>
+        <button type="button" class="tabs__tab" role="tab" data-tabs-target="tab" data-tab="billing" data-action="tabs#select">Billing</button>
+      </div>
+      <section class="tabs__panel" data-tabs-target="panel" data-tab="details">
+        <p class="muted" style="font-size: var(--text-sm);">Name, slug, and the team's public details.</p>
+      </section>
+      <section class="tabs__panel" data-tabs-target="panel" data-tab="members">
+        <p class="muted" style="font-size: var(--text-sm);">Fourteen members. Three admins, one owner.</p>
+      </section>
+      <section class="tabs__panel" data-tabs-target="panel" data-tab="billing">
+        <p class="muted" style="font-size: var(--text-sm);">Plan, seats, invoices, and the customer portal.</p>
+      </section>
+    </div>
+    <div>
+      <span class="sg-spec__class">data-controller="tabs"<br>.tabs__list .tabs__tab<br>.tabs__panel</span>
+      <p class="sg-spec__note">
+        Use client-side tabs only when every panel is cheap to render at once.
+        Otherwise use real links and let Turbo Drive load each view.
+      </p>
+    </div>
+  </div>
+
+  <div class="sg-spec">
+    <div class="cluster">
+      <div class="dropdown" data-controller="dropdown">
+        <button type="button" class="btn" data-action="dropdown#toggle" data-dropdown-target="button" aria-expanded="false">
+          Ada Lovelace
+        </button>
+        <div class="dropdown__menu dropdown__menu--left" data-dropdown-target="menu" hidden>
+          <a class="dropdown__item" href="#surfaces">Account</a>
+          <a class="dropdown__item" href="#surfaces">Team settings</a>
+          <a class="dropdown__item" href="#surfaces">Sign out</a>
+        </div>
+      </div>
+
+      <div data-controller="toggle">
+        <button type="button" class="btn btn--ghost" data-action="toggle#toggle" data-toggle-target="trigger" aria-expanded="false">
+          Advanced options
+        </button>
+        <div data-toggle-target="content" hidden style="margin-top: var(--space-3);">
+          <p class="muted" style="font-size: var(--text-sm);">Whatever the disclosure was hiding.</p>
+        </div>
+      </div>
+
+      <div data-controller="clipboard" data-clipboard-text-value="acme-crm">
+        <button type="button" class="btn btn--sm" data-action="clipboard#copy" data-clipboard-target="button">
+          Copy slug
+        </button>
+      </div>
+    </div>
+    <div>
+      <span class="sg-spec__class">data-controller="dropdown"<br>data-controller="toggle"<br>data-controller="clipboard"</span>
+      <p class="sg-spec__note">
+        Three of the seven controllers. The dropdown's shadow is the single one
+        permitted anywhere in the system: it separates a floating layer from the
+        page rather than decorating a static box.
+      </p>
+    </div>
+  </div>
+
+  <div class="sg-spec">
+    <div>
+      <hr class="rule">
+      <p class="quiet" style="font-size: var(--text-xs);">.rule — a hairline between sections</p>
+      <hr class="rule rule--strong">
+      <p class="quiet" style="font-size: var(--text-xs);">.rule--strong — a structural division</p>
+    </div>
+    <div>
+      <span class="sg-spec__class">.rule<br>.rule--strong</span>
+      <p class="sg-spec__note">
+        Two weights of separator. The strong one is the same ink as body text and
+        marks a real break, not a pause.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="sg-section" id="where">
+  <div class="sg-section__head">
+    <h2>Where this lives</h2>
+  </div>
+  <dl class="detail-list">
+    <dt>Tokens</dt><dd><code>app/assets/stylesheets/abstracts/_variables.scss</code></dd>
+    <dt>Mixins</dt><dd><code>abstracts/_mixins.scss</code>, <code>abstracts/_breakpoints.scss</code></dd>
+    <dt>Components</dt><dd><code>components/</code>, imported by hand in <code>application.scss</code></dd>
+    <dt>This page</dt><dd><code>app/views/styleguide/show.html.erb</code> and <code>pages/_styleguide.scss</code></dd>
+    <dt>The rules</dt><dd><code>SKILL.md</code> §5 &middot; <code>STYLE.md</code> §9</dd>
+  </dl>
+</section>

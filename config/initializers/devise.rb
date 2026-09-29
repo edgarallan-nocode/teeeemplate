@@ -279,6 +279,19 @@ Devise.setup do |config|
   # Add a new OmniAuth provider. Check the wiki for more information on setting
   # up on your models and hooks.
   # config.omniauth :github, 'APP_ID', 'APP_SECRET', scope: 'user,public_repo'
+  #
+  # Sign in with Google. The client id and secret come from config.x
+  # (config/application.rb); a blank pair leaves the strategy registered but
+  # the button hidden. `access_type: "online"` because nothing here ever calls
+  # a Google API after sign-in, so a refresh token would only be something to
+  # lose; `prompt: "select_account"` so a person with two Google accounts is
+  # asked which one rather than silently given the last one.
+  config.omniauth :google_oauth2,
+                  Rails.configuration.x.google_client_id,
+                  Rails.configuration.x.google_client_secret,
+                  scope: "email profile",
+                  access_type: "online",
+                  prompt: "select_account"
 
   # ==> Warden configuration
   # If you want to use other strategies, that are not supported by Devise, or

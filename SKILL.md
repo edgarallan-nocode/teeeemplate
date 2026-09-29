@@ -136,6 +136,32 @@ that feature rather than assuming Devise did.
 `config.send_email_changed_notification` is on and must stay on: it is the only
 signal a hijacked account gives its real owner.
 
+### Sign in with Google
+
+Devise `:omniauthable` with `omniauth-google-oauth2`, on when
+`google.{client_id,client_secret}` are in credentials and off — button hidden,
+nothing else changes — when they are blank. `users.google_uid` holds Google's
+stable subject id under a partial unique index, and `Users::SignInWithGoogle` is
+its only writer. Three things there are deliberate:
+
+- **A signed-out Google sign-in never links to an existing account by email.**
+  Addresses are unverified (above), so an account with that address is only a
+  claim on it — and it may have been made by somebody who kept the password and
+  is waiting for the real owner to arrive through Google and start working
+  inside it. The callback refuses and says to sign in with the password and
+  connect Google from the account page. That connect branch, reached while
+  signed in, is the only way an existing user gains a `google_uid`; a sign-in
+  matches on the uid alone, so a renamed Google address still reaches the same
+  user.
+- **A Google sign-up is a sign-up.** It lands the same way as the password form
+  — signed in at once, stored location honoured, no mail — and carries a random
+  password nobody knows. "Forgot your password?" is how such a user gets a real
+  one; nothing else here needs to know the difference.
+- **Disconnecting asks for the password**, because after it the password is the
+  only way in. The request phase is POST-only (OmniAuth 2) and the form token on
+  that POST is verified by `omniauth-rails_csrf_protection`; do not switch the
+  button back to a link.
+
 ## 3. Service objects
 
 A service is for a **multi-step operation** that touches more than one model or
@@ -184,6 +210,26 @@ Frame.
 
 esbuild is there so a genuine npm dependency can be added when one is warranted.
 That is a considered decision, not a default.
+
+**TipTap is that dependency.** The rich text editor — `Project#description` is
+the worked example — is ProseMirror through `@tiptap/*`, driven by
+`rich_text_editor_controller.js`; the toolbar, slash menu and popovers around it
+are plain DOM classes in `app/javascript/editor/`, not a framework. Two hidden
+fields carry the HTML and the editor's JSON, so the form works — and degrades —
+like any other form.
+
+Three rules come with it. **`RichText` is the only code that decides what of
+that HTML may render**: it sanitises before the model saves and again in the
+`rich_text` helper, against an allowlist that is the editor's vocabulary and
+nothing more; an `<iframe>` survives only as a YouTube embed rebuilt from its id,
+an `<img>` only with an http(s) source or one of our own Active Storage paths.
+**Pictures are uploaded, not linked**: the editor posts a dropped, pasted or
+chosen file to a per-record images endpoint (`Projects::ImagesController`),
+which attaches it through `EditorImages` and answers with the address to put in
+the text — so a rich text field belongs on a record that exists and that the
+person may write to. And the editor's JSON (`content`) is a convenience for
+reopening the editor, rebuilt from the HTML when absent, never the source of
+truth.
 
 ---
 
@@ -256,7 +302,7 @@ Price ids come from credentials via `Plan#stripe_price_id`, never from
 
 | Goes in | What |
 |---|---|
-| **Rails credentials** | Stripe keys and webhook secret, Stripe price ids, Sentry DSN |
+| **Rails credentials** | Stripe keys and webhook secret, Stripe price ids, Sentry DSN, Google OAuth client (optional) |
 | **Environment variables** | `DATABASE_URL`, `REDIS_URL`, `APP_HOST`, ports, thread counts, AWS region and bucket |
 | **Nowhere** | AWS access keys |
 

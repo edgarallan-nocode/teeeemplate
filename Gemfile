@@ -29,6 +29,16 @@ gem "devise", "~> 5.0"
 gem "pundit", "~> 2.5"
 gem "bcrypt", "~> 3.1"
 
+# Sign in with Google. The client half of OAuth — state, the code exchange,
+# verifying Google's ID token against its published keys — is exactly specified
+# and easy to get subtly wrong by hand. OmniAuth is Devise's own integration
+# point for this, and the Google strategy is the maintained one. The CSRF gem
+# is not optional: OmniAuth 2 makes the request phase POST-only for exactly the
+# reason that gem exists, and without it the Rails form token is not checked on
+# that POST.
+gem "omniauth-google-oauth2", "~> 1.2"
+gem "omniauth-rails_csrf_protection", "~> 1.0"
+
 # ---------------------------------------------------------------------------
 # Background work
 # ---------------------------------------------------------------------------

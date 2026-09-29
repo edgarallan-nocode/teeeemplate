@@ -17,6 +17,9 @@ class ProjectPolicy < ApplicationPolicy
   def destroy? = admin_or_above?
   def archive? = member?
 
+  # Putting a picture into the description. The same people who may edit it.
+  def upload_image? = member?
+
   class Scope < ApplicationPolicy::Scope
     def resolve
       return scope.none if membership.nil?

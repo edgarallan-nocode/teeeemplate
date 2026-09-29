@@ -1,4 +1,4 @@
-<%= form_with model: project, class: "form" do |f| %>
+<%= form_with model: project, class: "form form--wide" do |f| %>
   <%= render "shared/form_errors", record: project %>
 
   <div class="field">
@@ -6,10 +6,26 @@
     <%= f.text_field :name, autofocus: true, class: "input" %>
   </div>
 
-  <div class="field">
+  <%# The editor. Two hidden fields carry what it produces — the HTML the page
+      renders and the editor's own JSON — and the controller writes both on every
+      change. Without JavaScript the fields still submit what was loaded, so the
+      name can be changed without touching the text. %>
+  <div class="field" data-controller="rich-text-editor"
+       data-rich-text-editor-placeholder-value="Write, or type / for a block…"
+       data-rich-text-editor-upload-url-value="<%= project.persisted? ? project_images_path(project) : nil %>">
     <%= f.label :description, class: "field__label" %>
-    <%= f.text_area :description, class: "textarea" %>
-    <p class="field__hint">Optional. Up to 2,000 characters.</p>
+    <%= f.hidden_field :description, data: { rich_text_editor_target: "html" } %>
+    <%= f.hidden_field :content, value: project.content&.to_json, data: { rich_text_editor_target: "json" } %>
+    <div class="editor" data-rich-text-editor-target="editor"></div>
+    <p class="field__hint">
+      Optional. Select text for formatting, or type <code>/</code> for headings,
+      lists, images, video, code and tables.
+      <% if project.persisted? %>
+        Drop a picture anywhere on the page to add it.
+      <% else %>
+        Pictures can be added once the project exists.
+      <% end %>
+    </p>
   </div>
 
   <div class="form-actions">
