@@ -69,11 +69,11 @@ Rails.application.configure do
   config.action_mailer.delivery_method = :ses_v2
   config.action_mailer.ses_v2_settings = { region: ENV.fetch("AWS_REGION", "us-east-1") }
   config.action_mailer.raise_delivery_errors = true
+  # The host comes from APP_HOST or credentials — see config/application.rb.
   config.action_mailer.default_url_options = {
-    host: ENV.fetch("APP_HOST"), protocol: ENV.fetch("APP_PROTOCOL", "https")
+    host: config.x.app_host, protocol: config.x.app_protocol
   }
-  config.action_mailer.asset_host =
-    "#{ENV.fetch('APP_PROTOCOL', 'https')}://#{ENV.fetch('APP_HOST')}"
+  config.action_mailer.asset_host = "#{config.x.app_protocol}://#{config.x.app_host}" if config.x.app_host
 
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
@@ -88,12 +88,12 @@ Rails.application.configure do
 
   # Enable DNS rebinding protection and other `Host` header attacks.
   # Only serve requests for the configured application host.
-  config.hosts << ENV["APP_HOST"] if ENV["APP_HOST"].present?
+  config.hosts << config.x.app_host if config.x.app_host
 
   # Action Cable rides the same Redis instance as Sidekiq.
-  config.action_cable.allowed_request_origins = [
-    %r{https?://#{Regexp.escape(ENV.fetch('APP_HOST', 'example.com'))}}
-  ]
+  if config.x.app_host
+    config.action_cable.allowed_request_origins = [ %r{https?://#{Regexp.escape(config.x.app_host)}} ]
+  end
 
   # config.hosts = [
   #   "example.com",     # Allow requests from example.com

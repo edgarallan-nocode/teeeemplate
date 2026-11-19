@@ -61,8 +61,12 @@ module Teeeemplate
     config.x.app_name = ENV.fetch("APP_NAME", "Teeeemplate")
 
     # Application-wide host, used by mailers and anything building absolute URLs.
-    config.x.app_host     = ENV.fetch("APP_HOST", "localhost:3000")
-    config.x.app_protocol = ENV.fetch("APP_PROTOCOL", "http")
+    # APP_HOST wins; otherwise app_host from credentials, so a server needs no
+    # variable for it. Production has no localhost fallback: with neither set it
+    # still boots (so credentials:edit works), and mail fails at send time.
+    config.x.app_host     = ENV["APP_HOST"].presence || credentials.app_host.presence ||
+                            ("localhost:3000" unless Rails.env.production?)
+    config.x.app_protocol = ENV.fetch("APP_PROTOCOL") { Rails.env.production? ? "https" : "http" }
     config.x.mailer_from  = ENV.fetch("MAILER_FROM", "noreply@example.com")
     config.x.support_email = ENV.fetch("SUPPORT_EMAIL", "support@example.com")
 

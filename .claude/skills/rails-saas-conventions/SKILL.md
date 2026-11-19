@@ -256,8 +256,8 @@ Price ids come from credentials via `Plan#stripe_price_id`, never from
 
 | Goes in | What |
 |---|---|
-| **Rails credentials** | Stripe keys and webhook secret, Stripe price ids, Sentry DSN |
-| **Environment variables** | `DATABASE_URL`, `REDIS_URL`, `APP_HOST`, ports, thread counts, AWS region and bucket |
+| **Rails credentials** | Stripe keys and webhook secret, Stripe price ids, Sentry DSN, the production app host |
+| **Environment variables** | `DATABASE_URL`, `REDIS_URL`, ports, thread counts, AWS region and bucket |
 | **Nowhere** | AWS access keys |
 
 ```bash
